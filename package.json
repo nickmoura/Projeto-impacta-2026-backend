@@ -1,0 +1,22 @@
+{
+  "name": "projeto-impacta-2026",
+  "version": "1.0.0",
+  "description": "tcc",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "i": "^0.3.7",
+    "mysql2": "^3.17.0",
+    "nodemon": "^3.1.11",
+    "npm": "^11.10.0",
+    "sequelize": "^6.37.7"
+  }
+}
