@@ -2,6 +2,7 @@
 //exemplo rota de usuarios logados userRouter
 //rota de usuarios publicas como o login authRoutes
 //nomes arbitrarios meninas podemos e provavelmente iremos mudar isso.
+//teste commitew
 
 import express from 'express';
 
