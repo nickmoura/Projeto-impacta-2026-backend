@@ -61,3 +61,4 @@ npm install
 ```
 
 ## Crie uma env
+Crie uma env usando o arquivo env.exemple
