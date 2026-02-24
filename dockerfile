@@ -6,6 +6,7 @@ FROM node:alpine
 ## Pode ser o diretório que você quiser
 WORKDIR /app
 
+RUN apk add --no-cache openssl
 ## Copia tudo que começa com package e termina com .json para dentro da pasta /usr/app
 COPY package*.json ./
 
