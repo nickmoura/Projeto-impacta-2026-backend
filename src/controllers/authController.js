@@ -1,4 +1,4 @@
-import User from "../models/UserModel"; 
+import User from "../controllers/models/UserModel"; 
 import bcrypt from "bcrypt";
 
 const registro = async (req, res) => {
