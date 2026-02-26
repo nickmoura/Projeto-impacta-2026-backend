@@ -10,7 +10,7 @@ const app = express();
 
 app.use(express.json());
 
-app.use(publicRoutes);
+app.use('/api',publicRoutes);
 app.use(privateRoutes);
 
 export default app;
