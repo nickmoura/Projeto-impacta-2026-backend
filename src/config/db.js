@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+import mysql from 'mysql2/promise';
 
 const isProduction = process.env.DB_SSL_MODE === 'REQUIRED';
 
@@ -13,4 +13,4 @@ const pool = mysql.createPool({
     connectionLimit: 10,
 });
 
-module.exports = pool;
+export default pool;

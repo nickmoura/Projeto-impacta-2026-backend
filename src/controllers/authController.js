@@ -1,4 +1,4 @@
-import User from "../controllers/models/UserModel"; 
+import User from "../models/UserModel.js"; 
 import bcrypt from "bcrypt";
 
 const registro = async (req, res) => {
@@ -35,7 +35,4 @@ const registro = async (req, res) => {
     }
 };
 
-module.exports = {
-    registro
-};
-
+export { registro };
