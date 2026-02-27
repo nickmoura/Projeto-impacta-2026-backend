@@ -1,1 +1,0 @@
-//regra de negocio de autenticação, como login, registro, geracao de token etc.

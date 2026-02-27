@@ -1,1 +1,0 @@
-//aqui faremos a lógica de autenticação, como login, logout, etc.

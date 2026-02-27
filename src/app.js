@@ -1,16 +1,17 @@
-import express from 'express';
-import dotenv from 'dotenv';
+const express = require('express');
+const cors = require('cors');
 
-import publicRoutes from './routes/public.js';
-import privateRoutes from './routes/private.js';
-
-dotenv.config();
+const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
-app.use(publicRoutes);
-app.use(privateRoutes);
+app.use('/api/auth', authRoutes);
 
-export default app;
+app.get('/', (req, res) => {
+  res.json({ message: 'API funcionando corretamente 🚀' });
+});
+
+module.exports = app;
