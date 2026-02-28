@@ -2,7 +2,7 @@
   "name": "projeto-impacta-2026",
   "version": "1.0.0",
   "description": "tcc",
-
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
