@@ -11,6 +11,8 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: impacta
+      DB_PORT: 3306
+      DB_SSL_MODE: DISABLED
     volumes:
       - .:/app
       - /app/node_modules
