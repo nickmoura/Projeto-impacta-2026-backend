@@ -6,6 +6,8 @@ services:
       - "3000:3000"
     depends_on:
       - db
+    env_file:
+      - .env.docker
     environment:
       DB_HOST: db
       DB_USER: root
