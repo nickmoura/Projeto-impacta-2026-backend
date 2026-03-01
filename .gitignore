@@ -9,6 +9,7 @@ pnpm-debug.log*
 
 # Variáveis de ambiente
 .env
+.env.docker
 
 # Builds e logs de execução
 dist/
