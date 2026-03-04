@@ -1,4 +1,7 @@
+import dotenv from 'dotenv';
 import mysql from 'mysql2/promise';
+
+dotenv.config();
 
 const isProduction = process.env.DB_SSL_MODE === 'REQUIRED';
 
