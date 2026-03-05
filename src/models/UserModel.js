@@ -8,14 +8,14 @@ const User = {
         return rows;
     },
 
-    createNewUser: async (nome, cpf, email, password) => {
-        const query = `INSERT INTO User (nome, cpf, email, password) values (?, ?, ?, ?)`;
-        const [result] = await pool.query(query, [nome, cpf, email, password]);
+    createNewUser: async (nome, cnpj, email, password) => {
+        const query = `INSERT INTO User (nome, cnpj, email, password) values (?, ?, ?, ?)`;
+        const [result] = await pool.query(query, [nome, cnpj, email, password]);
 
         return {
             id: result.insertId,
             nome,
-            cpf,
+            cnpj,
             email
         };
     },

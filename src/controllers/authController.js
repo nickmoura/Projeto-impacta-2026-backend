@@ -4,11 +4,11 @@ import jwt from "jsonwebtoken";
 
 const registro = async (req, res) => {
     try {
-        const { nome, cpf, email, password } = req.body; 
+        const { nome, cnpj, email, password } = req.body; 
 
-        if ( !nome || !cpf || !email || !password ) {
+        if ( !nome || !cnpj || !email || !password ) {
             return res.status(400).json({
-                error: 'nome, cpf, e-mail e senha são obrigatórios'
+                error: 'nome, cnpj, e-mail e senha são obrigatórios'
             });
         }
 
@@ -17,7 +17,7 @@ const registro = async (req, res) => {
 
         const novousuario = await User.createNewUser(
             nome, 
-            cpf,
+            cnpj,
             email,
             hashpassword
         );
