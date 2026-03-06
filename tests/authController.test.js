@@ -34,7 +34,7 @@ describe("AuthController - registro", () => {
     req = {
       body: {
         nome: "Lucas",
-        cpf: "12345678900",
+        cnpj: "12345678900",
         email: "lucas@email.com",
         password: "123456",
       },
@@ -55,7 +55,7 @@ describe("AuthController - registro", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      error: "nome, cpf, e-mail e senha são obrigatórios",
+      error: "nome, cnpj, e-mail e senha são obrigatórios",
     });
   });
 
