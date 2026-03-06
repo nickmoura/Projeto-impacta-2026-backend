@@ -1,11 +1,9 @@
-//isso pode ser renomeado para dominio depois
-//exemplo rota de usuarios logados userRouter
-//rota de usuarios publicas como o login authRoutes
-//nomes arbitrarios meninas podemos e provavelmente iremos mudar isso.
-//teste commitew
-
 import express from 'express';
+import  dashboradController  from '../controllers/dashboardController.js';
+import  authMiddleware  from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+router.get('/dashboard', authMiddleware, dashboradController);
 
 export default router;
