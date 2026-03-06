@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1772381944125" clover="3.2.0">
-  <project timestamp="1772381944126" name="All files">
+<coverage generated="1772675233055" clover="3.2.0">
+  <project timestamp="1772675233056" name="All files">
     <metrics statements="16" coveredstatements="16" conditionals="6" coveredconditionals="6" methods="2" coveredmethods="2" elements="24" coveredelements="24" complexity="0" loc="16" ncloc="16" packages="1" files="1" classes="1"/>
     <file name="authController.js" path="C:\Users\lucas\code\Projeto-impacta-2026-backend\src\controllers\authController.js">
       <metrics statements="16" coveredstatements="16" conditionals="6" coveredconditionals="6" methods="2" coveredmethods="2"/>
