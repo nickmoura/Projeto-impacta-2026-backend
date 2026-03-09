@@ -6,18 +6,28 @@ dotenv.config();
 
 const isProduction = process.env.DB_SSL_MODE === 'REQUIRED';
 
+let sslOptions = false;
+if (isProduction) {
+    if (fs.existsSync('./certs/ca.pem')) {
+        sslOptions = {
+            ca: fs.readFileSync('./certs/ca.pem'),
+            rejectUnauthorized: true
+        };
+    } else {
+        console.warn('CA certificate file not found. SSL connection may fail.');
+        sslOptions = { rejectUnauthorized: true };
+    }
+}
+
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT || 3306,
-    ssl: isProduction ? { rejectUnauthorized: true } : false,
+    ssl: sslOptions,
     waitForConnections: true,
-    connectionLimit: 10,
-    ssl: {
-        ca: fs.readFileSync('./certs/ca.pem')
-    }
+    connectionLimit: 10
 });
 
 export default pool;
