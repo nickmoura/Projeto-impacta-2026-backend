@@ -8,9 +8,9 @@ const isProduction = process.env.DB_SSL_MODE === 'REQUIRED';
 
 let sslOptions = false;
 if (isProduction) {
-    if (fs.existsSync('./etc/secrets/ca.pem')) {
+    if (fs.existsSync('/etc/secrets/ca.pem')) {
         sslOptions = {
-            ca: fs.readFileSync('./etc/secrets/ca.pem'),
+            ca: fs.readFileSync('/etc/secrets/ca.pem'),
             rejectUnauthorized: true
         };
     } else {
