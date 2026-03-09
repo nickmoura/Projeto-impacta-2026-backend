@@ -1,21 +1,30 @@
 import dotenv from 'dotenv';
 import mysql from 'mysql2/promise';
 import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
 const isProduction = process.env.DB_SSL_MODE === 'REQUIRED';
 
 let sslOptions = false;
+
 if (isProduction) {
-    if (fs.existsSync('/etc/secrets/ca.pem')) {
+
+    let caPath = '/etc/secrets/ca.pem';
+
+    if (!fs.existsSync(caPath)) {
+        caPath = path.resolve('etc/secrets/ca.pem');
+    }
+
+    if (fs.existsSync(caPath)) {
         sslOptions = {
-            ca: fs.readFileSync('/etc/secrets/ca.pem'),
+            ca: fs.readFileSync(caPath),
             rejectUnauthorized: true
         };
     } else {
-        console.warn('CA certificate file not found. SSL connection may fail.');
-        sslOptions = { rejectUnauthorized: true };
+        console.warn('CA certificate not found. Using fallback SSL.');
+        sslOptions = { rejectUnauthorized: false };
     }
 }
 
