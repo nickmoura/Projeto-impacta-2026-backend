@@ -22,3 +22,6 @@ build/
 .idea/
 .DS_Store
 /src/generated/prisma
+
+# Certificado SSL do banco
+*.pem
