@@ -24,4 +24,4 @@ build/
 /src/generated/prisma
 
 # Certificado SSL do banco
-*.pem
+/certs
