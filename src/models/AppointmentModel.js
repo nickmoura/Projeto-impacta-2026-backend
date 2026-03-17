@@ -1,4 +1,5 @@
-import pooll from "../config/database.js";
+import pool from "../config/db.js";
+
 
 const Appointment = {
 
