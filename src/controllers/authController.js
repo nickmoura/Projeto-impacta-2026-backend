@@ -4,22 +4,25 @@ import jwt from "jsonwebtoken";
 
 const registro = async (req, res) => {
     try {
-        const { nome, cnpj, email, password } = req.body; 
+        const { nome, email, password } = req.body; 
 
-        if ( !nome || !cnpj || !email || !password ) {
+        if ( !nome || !email || !password) {
             return res.status(400).json({
-                error: 'nome, cnpj, e-mail e senha são obrigatórios'
+                error: 'nome, e-mail, senha são obrigatórios'
             });
         }
 
 
-        const hashpassword = await bcrypt.hash(password, 10); 
+        const hashpassword = await bcrypt.hash(password, 10);
+
+        const role = "user";
 
         const novousuario = await User.createNewUser(
-            nome, 
-            cnpj,
+            nome,
             email,
-            hashpassword
+            hashpassword,
+            role,
+            null
         );
 
         return res.status(201).json({
