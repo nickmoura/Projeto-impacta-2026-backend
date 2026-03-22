@@ -33,7 +33,7 @@ class AppointmentService {
         }
 
         try {
-            const appointment =await Appointment.createAppointement(
+            const appointment =await Appointment.createAppointment(
                 clinic_id,
                 doctor_id,
                 patient_id,
@@ -45,6 +45,7 @@ class AppointmentService {
             return appointment;
 
         }catch (error) {
+
             if (error.code === "ER_DUP_ENTRY") {
                 throw new Error("DUPLICATE_APPOINTEMENT");
             }

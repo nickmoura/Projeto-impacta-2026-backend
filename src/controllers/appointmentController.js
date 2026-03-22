@@ -12,20 +12,19 @@ class AppointmentController {
 
             return res.status(201).json(appointment);
         } catch (error) {
-            if (error.message === "todos os campos são obrigatórios") {
+            
+            if (error.message.toLowerCase() === "todos os campos são obrigatórios") {
                 return res.status(400).json({ error: "Todos os campos são obrigatórios" });
             }
 
-            if (error.message === "DUPLICATE_APPOINTEMENT") {
+            if (error.message === "DUPLICATE_APPOINTMENT") {
                 return res.status(409).json({
-                    error: "Já existe um agendamento para este horário"
+                    error: "Consulta ja existe"
                 });
             }
 
-            console.error(error);
-
             return res.status(500).json({
-                error:"Ërro interno ao criar consulta"
+                error:"Erro interno ao criar consulta"
             });
         }
     }

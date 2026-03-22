@@ -8,7 +8,7 @@ const registro = async (req, res) => {
 
         if ( !nome || !email || !password) {
             return res.status(400).json({
-                error: 'nome, e-mail, senha são obrigatórios'
+                error: 'nome, e-mail e senha são obrigatórios'
             });
         }
 
