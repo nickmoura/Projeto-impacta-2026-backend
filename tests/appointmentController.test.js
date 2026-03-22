@@ -63,9 +63,10 @@ it("deve retornar 409 para conflito", async () => {
 
     const res = mockResponse();
 
-    appointmentService.createAppointment.mockRejectedValue(
-        new Error("DUPLICATE_APPOINTMENT")
-    );
+    const error = new Error("DUPLICATE_APPOINTMENT");
+    error.code = "DUPLICATE_APPOINTMENT";
+
+    appointmentService.createAppointment.mockRejectedValue(error);
 
     await appointmentController.createAppointment(req, res);
 

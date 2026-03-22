@@ -42,12 +42,16 @@ class AppointmentService {
                 status
             );
 
+            console.log("Consulta criada:", appointment);
+
             return appointment;
 
         }catch (error) {
 
-            if (error.code === "ER_DUP_ENTRY") {
-                throw new Error("DUPLICATE_APPOINTEMENT");
+            if (error.code === "ER_DUP_ENTRY" || error.errno === 1062) {
+                const err = new Error("DUPLICATE_APPOINTMENT");
+                err.code = "DUPLICATE_APPOINTMENT";
+                throw err;
             }
 
             throw error;

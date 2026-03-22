@@ -55,6 +55,23 @@ describe("AppointmentService - createAppointment", () => {
 
         await expect(
             appointmentService.createAppointment(mockData)
-        ).rejects.toThrow("DUPLICATE_APPOINTEMENT");
+        ).rejects.toThrow("DUPLICATE_APPOINTMENT");
+    });
+
+    it("deve lancar erro desconhecido", async () => {
+        const mockData = {
+            clinic_id: 1,
+            doctor_id: 1,
+            patient_id: 1,
+            created_by: 1,
+            appointment_date: "2024-07-01 14:00:00",
+            status: "scheduled"
+        };
+
+        Appointment.createAppointment.mockRejectedValue(new Error("erro aleatorio no banco de dados"));
+
+        await expect(
+            appointmentService.createAppointment(mockData)
+        ).rejects.toThrow("erro aleatorio no banco de dados");
     });
 });

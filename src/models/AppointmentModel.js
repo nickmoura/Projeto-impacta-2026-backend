@@ -3,7 +3,7 @@ import pool from "../config/db.js";
 
 const Appointment = {
 
-    createAppointement: async (
+    createAppointment: async (
         clinic_id,
         doctor_id,
         patient_id,
@@ -37,15 +37,15 @@ const Appointment = {
     getAppointmentsByClinic: async (clinic_id) => {
         const query = `
             SELECT  
-            a.appointment_id,
-            a.date,
+            a.id,
+            a.appointment_date,
             a.status,
             p.nome AS patient_name,
             u.nome AS doctor_name
         FROM Appointment a
-        JOIN Patient p ON a.patient_id = p.patient_id
-        JOIN Doctor d ON a.doctor_id = d.doctor_id
-        JOIN User u ON d.user_id = u.user_id
+        JOIN Patient p ON a.patient_id = p.id
+        JOIN Doctor d ON a.doctor_id = d.id
+        JOIN User u ON d.user_id = u.id
         WHERE a.clinic_id = ? 
         `;
 
