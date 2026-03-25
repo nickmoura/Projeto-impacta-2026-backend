@@ -34,7 +34,6 @@ describe("AuthController - registro", () => {
     req = {
       body: {
         nome: "Lucas",
-        cnpj: "12345678900",
         email: "lucas@email.com",
         password: "123456",
       },
@@ -55,7 +54,7 @@ describe("AuthController - registro", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      error: "nome, cnpj, e-mail e senha são obrigatórios",
+      error: "nome, e-mail e senha são obrigatórios",
     });
   });
 
@@ -74,9 +73,10 @@ describe("AuthController - registro", () => {
 
     expect(User.createNewUser).toHaveBeenCalledWith(
       "Lucas",
-      "12345678900",
       "lucas@email.com",
-      "hashFake"
+      "hashFake",
+      "user",
+      null
     );
 
     expect(res.status).toHaveBeenCalledWith(201);
