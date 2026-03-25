@@ -70,6 +70,19 @@ class AppointmentService {
         }
     }
 
+    async updateAppointment(appointment_id, data) {
+        try {
+            const appointmment = await Appointment.updateAppointmentById(appointment_id, data);
+            return appointmment;
+        } catch (error) {
+            console.error("ERRO NO SERVICE:", error);
+            if (error.code === "ER_DUP_ENTRY" ) {
+                throw { code: "DUPLICATE_APPOINTMENT" };
+            }
+            throw error;
+        }
+    }
+
     async cancelAppointment(appointment_id) {
 
         try {

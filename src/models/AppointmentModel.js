@@ -78,6 +78,16 @@ const Appointment = {
     return rows[0];
 
    },
+    
+
+    async updateAppointment(appointment_id, data) {
+        const [update] =await debug('appointments')
+        .where({id})
+        .update(data)
+        .returning("*");
+
+        return update || null;
+    },
 
     cancelAppointmentById: async (appointment_id) => {
         const [rows] = await pool.query(

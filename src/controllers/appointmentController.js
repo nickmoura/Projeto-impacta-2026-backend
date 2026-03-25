@@ -48,6 +48,40 @@ class AppointmentController {
         }
     }
 
+    async updateAppointment(req, res) {
+        const { appointment_id } = req.params;
+
+        try {
+            const updatedAppointment = await appointmentService.updateAppointment(appointment_id,
+                {
+                    ...req.body,
+                    updated_by: req.user.id
+                });
+                
+                if (!updatedAppointment) {
+                    return res.status(404).json({ error: "Consulta não encontrada" });
+                }
+
+                return res.status(200).json(updatedAppointment);
+        } catch (error) {
+            console.error("ERRO NO CONTROLLER:", error);
+
+            if (error.code === "DUPLICATE_APPOINTMENT") {
+                return res.status(409).json({
+                    error: "Horário já ocupado"
+                });
+            }
+
+            if (error.message?.toLowerCase() === "todos os campos são obrigatórios") {
+                return res.status(400).json({ error: "Todos os campos são obrigatórios" });
+            }
+
+            return res.status(500).json({
+                error: "Erro interno ao atualizar consulta"
+            });
+        };
+    };
+
     async cancelAppointment(req, res) {
         const { appointment_id } = req.params;
 
