@@ -54,6 +54,31 @@ const Appointment = {
         return rows;
     },
 
+   getAppointmentByUser: async (user_id) => {
+    const query = `
+       SELECT  
+        a.id,
+        a.appointment_date,
+        a.status,
+        p.nome AS patient_name,
+        u.nome AS doctor_name
+    FROM Appointment a
+    LEFT JOIN Patient p ON a.patient_id = p.id
+    LEFT JOIN Doctor d ON a.doctor_id = d.id
+    LEFT JOIN User u ON d.user_id = u.id
+    WHERE 
+        a.created_by = ?
+        OR d.user_id = ?
+    `;
+
+    const [rows] = await pool.query(query, [user_id, user_id, user_id]);
+
+    if (rows.length === 0) return null;
+
+    return rows[0];
+
+   },
+
     cancelAppointmentById: async (appointment_id) => {
         const [rows] = await pool.query(
             `SELECT * FROM Appointment WHERE id = ?`,
