@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.get('/dashboard', authMiddleware, dashboradController);
 router.post('/appointments', authMiddleware, appointmentController.createAppointment);
+router.delete('/appointments/:appointment_id', authMiddleware, appointmentController.cancelAppointment);
 
 export default router;

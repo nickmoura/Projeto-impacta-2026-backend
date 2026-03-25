@@ -29,6 +29,29 @@ class AppointmentController {
             });
         }
     }
+
+    async cancelAppointment(req, res) {
+        const { appointment_id } = req.params;
+
+        try {
+            const appointment = await appointmentService.cancelAppointment(appointment_id);
+
+            if (!appointment) {
+                return res.status(404).json({ error: "Consulta não encontrada" });
+            }
+            else if (appointment.status === "cancelled") {
+                return res.status(400).json({ error: "Consulta já está cancelada" });
+            }
+            else return res.status(200).json({ message: "Consulta cancelada com sucesso" });
+
+        } catch (error) {
+            console.error("ERRO NO CONTROLLER:", error);
+            return res.status(500).json({
+                error: "Erro interno ao cancelar consulta"
+            });
+        }
+
+    }
 }
 
 export default new AppointmentController();
