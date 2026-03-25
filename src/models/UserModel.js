@@ -8,15 +8,22 @@ const User = {
         return rows;
     },
 
-    createNewUser: async (nome, cnpj, email, password) => {
-        const query = `INSERT INTO User (nome, cnpj, email, password) values (?, ?, ?, ?)`;
-        const [result] = await pool.query(query, [nome, cnpj, email, password]);
+    createNewUser: async (nome, email, password, role, clinic_id) => {
+        const query = `INSERT INTO User (nome, email, password, role, clinic_id) values (?, ?, ?, ?, ?)`;
+        const [result] = await pool.query(query, [
+            nome, 
+            email, 
+            password, 
+            role, 
+            clinic_id
+        ]);
 
         return {
             id: result.insertId,
             nome,
-            cnpj,
-            email
+            email,
+            role,
+            clinic_id
         };
     },
 
@@ -24,7 +31,7 @@ const User = {
         const [rows] = await pool.query("SELECT * FROM User WHERE email = ?", [email]);
 
         if (rows.length === 0) {
-            throw new Error("Usuário nao encontrado");
+            throw new Error("Usuário não encontrado");
         }
 
         const user = rows[0];
