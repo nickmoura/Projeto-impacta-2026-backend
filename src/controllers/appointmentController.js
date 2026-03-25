@@ -29,6 +29,47 @@ class AppointmentController {
             });
         }
     }
+
+    async getAppointments(req, res) {
+        const user_id = req.user.id;
+
+        try {
+            const result = await appointmentService.getAppointmentByUser(user_id);
+
+            if(!result) {
+                return res.status(404).json({ error: "Consulta nao encontrada" });
+            }
+
+            return res.status(200).json(result);
+
+        } catch (error) {
+            console.error("Erro interno ao buscar consulta:", error);
+            return res.status(500).json({ error: "Erro interno ao buscar consulta" });
+        }
+    }
+
+    async cancelAppointment(req, res) {
+        const { appointment_id } = req.params;
+
+        try {
+            const result = await appointmentService.cancelAppointment(appointment_id);
+
+            if (!result) {
+                return res.status(404).json({ error: "Consulta não encontrada" });
+            }
+            else if (result.alreadyCancelled) {
+                return res.status(400).json({ error: "Consulta já está cancelada" });
+            }
+            else return res.status(200).json({ message: "Consulta cancelada com sucesso" });
+
+        } catch (error) {
+            console.error("ERRO NO CONTROLLER:", error);
+            return res.status(500).json({
+                error: "Erro interno ao cancelar consulta"
+            });
+        }
+
+    }
 }
 
 export default new AppointmentController();

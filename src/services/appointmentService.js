@@ -57,6 +57,30 @@ class AppointmentService {
             throw error;
         }   
     }
-}
 
+    async getAppointmentByUser(user_id) {
+        try {
+            const appointment = await Appointment.getAppointmentByUser(user_id);
+
+            return appointment;
+
+        } catch (error) {
+            console.error("ERRO NO SERVICE:", error);
+            throw new Error("Erro ao buscar consulta");
+        }
+    }
+
+    async cancelAppointment(appointment_id) {
+
+        try {
+            const appointment = await Appointment.cancelAppointmentById(appointment_id);
+
+            return appointment;
+
+        } catch (error) {
+            console.error("ERRO NO SERVICE:", error);
+            throw new Error("Erro interno ao cancelar consulta");
+        }
+    }
+}
 export default new AppointmentService();
