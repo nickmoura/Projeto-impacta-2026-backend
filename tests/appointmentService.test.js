@@ -5,6 +5,7 @@ import Appointment from '../src/models/AppointmentModel.js';
 jest.mock('../src/models/AppointmentModel.js', () => ({
     createAppointment: jest.fn(),
     cancelAppointmentById: jest.fn(),
+    getAppointmentByUser: jest.fn(),
 }));
 
 describe("AppointmentService - createAppointment", () => {
@@ -77,6 +78,40 @@ describe("AppointmentService - createAppointment", () => {
     });
 });
 
+describe("AppointmentService - getAppointmentByUser", () => {
+
+    it("deve retornar consultas do usuário", async () => {
+        const mockAppointments = [
+            { id: 1, user_id: 1 },
+            { id: 2, user_id: 1 }
+        ];
+
+        Appointment.getAppointmentByUser.mockResolvedValue(mockAppointments);
+
+        const result = await appointmentService.getAppointmentByUser(1);
+
+        expect(result).toEqual(mockAppointments);
+        expect(Appointment.getAppointmentByUser).toHaveBeenCalledWith(1);
+    });
+
+    it("deve retornar null se não houver consultas", async () => {
+        Appointment.getAppointmentByUser.mockResolvedValue(null);
+
+        const result = await appointmentService.getAppointmentByUser(1);
+
+        expect(result).toBeNull();
+    });
+
+    it("deve lançar erro quando falhar", async () => {
+        Appointment.getAppointmentByUser.mockRejectedValue(
+            new Error("erro no banco")
+        );
+
+        await expect(
+            appointmentService.getAppointmentByUser(1)
+        ).rejects.toThrow("Erro ao buscar consulta");
+    });
+});
 
 describe("AppointmentService - cancelAppointment", () => {
     it("deve cancelar com sucesso", async () => {

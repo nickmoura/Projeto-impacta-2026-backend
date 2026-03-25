@@ -164,3 +164,65 @@ it("retorna 500 para erro interno", async () => {
         error: "Erro interno ao cancelar consulta"
     });
 });
+
+
+describe("getAppointments", () => {
+
+    it("deve retornar 200 com lista de consultas", async () => {
+        const req = {
+            user: { id: 1 }
+        };
+        const res = mockResponse();
+
+        const mockResult = [
+            {
+                id: 1,
+                appointment_date: "2026-03-20T14:00:00.000Z",
+                status: "scheduled"
+            }
+        ];
+
+        appointmentService.getAppointmentByUser.mockResolvedValue(mockResult);
+
+        await appointmentController.getAppointments(req, res);
+
+        expect(appointmentService.getAppointmentByUser).toHaveBeenCalledWith(1);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(mockResult);
+    });
+
+    it("deve retornar 404 quando nao encontrar consultas", async () => {
+        const req = {
+            user: { id: 1 }
+        };
+        const res = mockResponse();
+
+        appointmentService.getAppointmentByUser.mockResolvedValue(null);
+
+        await appointmentController.getAppointments(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({
+            error: "Consulta nao encontrada"
+        });
+    });
+
+    it("deve retornar 500 em caso de erro interno", async () => {
+        const req = {
+            user: { id: 1 }
+        };
+        const res = mockResponse();
+
+        appointmentService.getAppointmentByUser.mockRejectedValue(
+            new Error("erro inesperado")
+        );
+
+        await appointmentController.getAppointments(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+            error: "Erro interno ao buscar consulta"
+        });
+    });
+
+});
