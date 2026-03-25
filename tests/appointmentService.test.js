@@ -4,6 +4,7 @@ import Appointment from '../src/models/AppointmentModel.js';
 
 jest.mock('../src/models/AppointmentModel.js', () => ({
     createAppointment: jest.fn(),
+    cancelAppointmentById: jest.fn(),
 }));
 
 describe("AppointmentService - createAppointment", () => {
@@ -73,5 +74,26 @@ describe("AppointmentService - createAppointment", () => {
         await expect(
             appointmentService.createAppointment(mockData)
         ).rejects.toThrow("erro aleatorio no banco de dados");
+    });
+});
+
+
+describe("AppointmentService - cancelAppointment", () => {
+    it("deve cancelar com sucesso", async () => {
+        Appointment.cancelAppointmentById.mockResolvedValue({ id: 1 });
+
+        const result = await appointmentService.cancelAppointment(1);
+
+        expect(result).toEqual({ id: 1 });
+    });
+
+    it("deve lancar erro interno quando falhar", async () => {
+        Appointment.cancelAppointmentById.mockRejectedValue(
+            new Error("error no banco")
+        );
+        
+        await expect(
+            appointmentService.cancelAppointment(1)
+        ).rejects.toThrow("Erro interno ao cancelar consulta");
     });
 });

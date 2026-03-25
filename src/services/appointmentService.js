@@ -58,20 +58,13 @@ class AppointmentService {
         }   
     }
 
-    async cancelAppointment(req, res) {
-        const { appointment_id } = req.params;
-        const { motivo_cancelamento } = req.body;
+    async cancelAppointment(appointment_id) {
 
         try {
-            const resultado = await this.cancelAppointment(appointment_id, motivo_cancelamento);
+            const appointment = await Appointment.cancelAppointmentById(appointment_id);
 
-            if (!resultado) {
-                return res.status(404).json({ error: "Consulta não encontrada" });
-            }
-            else if (resultado.status === "cancelled") {
-                return res.status(400).json({ error: "Consulta já está cancelada" });
-            }
-            else return res.status(200).json({ message: "Consulta cancelada com sucesso" });    
+            return appointment;
+
         } catch (error) {
             console.error("ERRO NO SERVICE:", error);
             throw new Error("Erro interno ao cancelar consulta");

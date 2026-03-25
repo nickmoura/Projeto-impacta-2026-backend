@@ -52,8 +52,29 @@ const Appointment = {
         const [rows] = await pool.query(query, [clinic_id]);
 
         return rows;
-    }
+    },
 
+    cancelAppointmentById: async (appointment_id) => {
+        const [rows] = await pool.query(
+            `SELECT * FROM Appointment WHERE id = ?`,
+            [appointment_id]
+        );
+
+        if (rows.length === 0) return null;
+
+        const appointment = rows[0];
+
+        if (appointment.status === "cancelled") {
+            return { alreadyCancelled: true };
+        }
+
+        await pool.query(
+            `UPDATE Appointment SET status = 'cancelled' WHERE id = ?`,
+            [appointment_id]
+        );
+
+        return { alreadyCancelled: false };
+    }
 };
 
 export default Appointment;

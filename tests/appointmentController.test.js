@@ -89,3 +89,78 @@ it("deve retornar 500 para erro interno", async () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
 });
+
+it("deve retornar 200 quando result nao tem alredyCancelled", async () => {
+    const req = {
+        params: {
+            appointment_id: '123'
+        }
+    };
+    const res = mockResponse();
+
+    appointmentService.cancelAppointment.mockResolvedValue({});
+
+    await appointmentController.cancelAppointment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+});
+
+it("retorna 404 quando result é null", async () => {
+    const req = { params: { appointment_id: '1'}};
+    const res = mockResponse();
+
+    appointmentService.cancelAppointment.mockResolvedValue(null);
+
+    await appointmentController.cancelAppointment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ 
+        error: "Consulta não encontrada"
+    });
+});
+
+it("retorna 400 quando result tem alreadyCancelled", async () => {
+    const req = { params: { appointment_id: '1'}};
+    const res = mockResponse();
+
+    appointmentService.cancelAppointment.mockResolvedValue({ alreadyCancelled: true });
+
+    await appointmentController.cancelAppointment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ 
+        error: "Consulta já está cancelada"
+    });
+});
+
+it("retorna 200 quando cancelamento é sucesso", async () => {
+    const req = { params: { appointment_id: '1'}};
+    const res = mockResponse();
+
+    appointmentService.cancelAppointment.mockResolvedValue({
+        alreadyCancelled: false
+    });
+
+    await appointmentController.cancelAppointment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ 
+        message: "Consulta cancelada com sucesso"
+    });
+});
+
+it("retorna 500 para erro interno", async () => {
+    const req = { params: { appointment_id: '1'}};
+    const res = mockResponse();
+
+    appointmentService.cancelAppointment.mockRejectedValue(
+        new Error("falha inesperada")
+    );
+
+    await appointmentController.cancelAppointment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ 
+        error: "Erro interno ao cancelar consulta"
+    });
+});
