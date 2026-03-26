@@ -71,22 +71,63 @@ const Appointment = {
         OR d.user_id = ?
     `;
 
-    const [rows] = await pool.query(query, [user_id, user_id, user_id]);
+    const [rows] = await pool.query(query, [user_id, user_id]);
 
     if (rows.length === 0) return null;
 
-    return rows[0];
+    return rows;
 
    },
     
 
-    async updateAppointment(appointment_id, data) {
-        const [update] =await debug('appointments')
-        .where({id})
-        .update(data)
-        .returning("*");
+    updateAppointmentById: async (appointment_id, data) => {
+    
+        const [rows] = await pool.query(
+            `SELECT * FROM Appointment WHERE id = ?`,
+            [appointment_id]
+        );
 
-        return update || null;
+        if (rows.length === 0) return null;
+
+        const fields = [];
+        const values = [];
+
+        if (data.clinic_id !== undefined) {
+            fields.push("clinic_id = ?");
+            values.push(data.clinic_id);
+        }
+        if (data.doctor_id !== undefined) {
+            fields.push("doctor_id = ?");
+            values.push(data.doctor_id);
+        }
+        if (data.patient_id !== undefined) {
+            fields.push("patient_id = ?");
+            values.push(data.patient_id);
+        }
+        if (data.appointment_date !== undefined) {
+            fields.push("appointment_date = ?");
+            values.push(data.appointment_date);
+        }
+        if (data.status !== undefined) {
+            fields.push("status = ?");
+            values.push(data.status);
+        }
+
+        if (fields.length === 0) return rows[0];
+
+        values.push(appointment_id);
+
+        const query = `UPDATE Appointment SET ${fields.join(", ")} WHERE id = ?`;
+
+        await pool.query(query, values);
+
+        
+        const [updatedRows] = await pool.query(
+            `SELECT * FROM Appointment WHERE id = ?`,
+            [appointment_id]
+        );
+
+        return updatedRows[0];
     },
 
     cancelAppointmentById: async (appointment_id) => {

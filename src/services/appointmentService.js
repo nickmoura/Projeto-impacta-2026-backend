@@ -60,9 +60,9 @@ class AppointmentService {
 
     async getAppointmentByUser(user_id) {
         try {
-            const appointment = await Appointment.getAppointmentByUser(user_id);
+            const appointments = await Appointment.getAppointmentByUser(user_id);
 
-            return appointment;
+            return appointments;
 
         } catch (error) {
             console.error("ERRO NO SERVICE:", error);
@@ -71,24 +71,25 @@ class AppointmentService {
     }
 
     async updateAppointment(appointment_id, data) {
+        if(!appointment_id)  throw new Error("ID da consulta é obrigatório");
+
         try {
-            const appointmment = await Appointment.updateAppointmentById(appointment_id, data);
-            return appointmment;
+            const updated = await Appointment.updateAppointmentById(appointment_id, data);
+            return updated;
         } catch (error) {
             console.error("ERRO NO SERVICE:", error);
-            if (error.code === "ER_DUP_ENTRY" ) {
-                throw { code: "DUPLICATE_APPOINTMENT" };
-            }
+            if (error.code === "ER_DUP_ENTRY") throw { code: "DUPLICATE_APPOINTMENT" };
             throw error;
         }
     }
 
     async cancelAppointment(appointment_id) {
+        if (!appointment_id) throw new Error("ID da consulta é obrigatório");
 
         try {
-            const appointment = await Appointment.cancelAppointmentById(appointment_id);
+            const result = await Appointment.cancelAppointmentById(appointment_id);
 
-            return appointment;
+            return result;
 
         } catch (error) {
             console.error("ERRO NO SERVICE:", error);

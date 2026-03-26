@@ -32,9 +32,9 @@ model User {
   email     String   @unique
   password  String
   role      String
-  clinic_id Int
+  clinic_id Int?
 
-  clinic   Clinic @relation(fields: [clinic_id], references: [id])
+  clinic   Clinic? @relation(fields: [clinic_id], references: [id])
   doctor   Doctor?
   appointments Appointment[] @relation("CreatedAppointments")
 }

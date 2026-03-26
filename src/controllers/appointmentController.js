@@ -7,9 +7,7 @@ class AppointmentController {
             const appointment = await appointmentService.createAppointment({
                 ...req.body,
                 created_by: req.user.id
-            })
-                
-
+            });
             return res.status(201).json(appointment);
         } catch (error) {
             console.error("ERRO NO CONTROLLER:", error);
@@ -34,13 +32,13 @@ class AppointmentController {
         const user_id = req.user.id;
 
         try {
-            const result = await appointmentService.getAppointmentByUser(user_id);
+            const appointments = await appointmentService.getAppointmentByUser(user_id);
 
-            if(!result) {
+            if(!appointments || appointments.length === 0) {
                 return res.status(404).json({ error: "Consulta nao encontrada" });
             }
 
-            return res.status(200).json(result);
+            return res.status(200).json(appointments);
 
         } catch (error) {
             console.error("Erro interno ao buscar consulta:", error);
@@ -49,10 +47,10 @@ class AppointmentController {
     }
 
     async updateAppointment(req, res) {
-        const { appointment_id } = req.params;
+        const { id } = req.params;
 
         try {
-            const updatedAppointment = await appointmentService.updateAppointment(appointment_id,
+            const updatedAppointment = await appointmentService.updateAppointment(id,
                 {
                     ...req.body,
                     updated_by: req.user.id
@@ -83,10 +81,10 @@ class AppointmentController {
     };
 
     async cancelAppointment(req, res) {
-        const { appointment_id } = req.params;
+        const { id } = req.params;
 
         try {
-            const result = await appointmentService.cancelAppointment(appointment_id);
+            const result = await appointmentService.cancelAppointment(id);
 
             if (!result) {
                 return res.status(404).json({ error: "Consulta não encontrada" });
