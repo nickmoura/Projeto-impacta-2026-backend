@@ -13,11 +13,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Clinic {
+  id        Int    @id @default(autoincrement())
+  nome      String
+  cnpj      String @unique
+  email     String @unique
+  password  String
+
+  users       User[]
+  doctors     Doctor[]
+  patients    Patient[]
+  appointments Appointment[]
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   nome      String
-  cnpj       String   @unique
   email     String   @unique
   password  String
-  createdAt DateTime @default(now())
+  role      String
+  clinic_id Int?
+
+  clinic   Clinic? @relation(fields: [clinic_id], references: [id])
+  doctor   Doctor?
+  appointments Appointment[] @relation("CreatedAppointments")
+}
+
+model Doctor {
+  id        Int    @id @default(autoincrement())
+  user_id   Int    @unique
+  clinic_id Int
+  crm       String
+  specialty String
+
+  user     User   @relation(fields: [user_id], references: [id])
+  clinic   Clinic @relation(fields: [clinic_id], references: [id])
+  appointments Appointment[]
+}
+
+model Patient {
+  id        Int    @id @default(autoincrement())
+  nome      String
+  email     String @unique
+  telefone  String
+  endereco  String
+  clinic_id Int
+
+  clinic     Clinic @relation(fields: [clinic_id], references: [id])
+  appointments Appointment[]
+}
+
+model Appointment {
+  id               Int      @id @default(autoincrement())
+  clinic_id        Int
+  doctor_id        Int
+  patient_id       Int
+  created_by       Int
+  appointment_date DateTime
+  status           String
+
+  clinic   Clinic @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
+  doctor   Doctor  @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+  patient  Patient @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  createdBy User   @relation("CreatedAppointments", fields: [created_by], references: [id], onDelete:Cascade)
+
+  @@unique([doctor_id, appointment_date])
+  @@index([patient_id])
 }
