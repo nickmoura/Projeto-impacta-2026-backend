@@ -4,11 +4,11 @@ import jwt from "jsonwebtoken";
 
 const registro = async (req, res) => {
     try {
-        const { nome, email, password } = req.body; 
+        const { nome, email, password, clinic_id } = req.body; 
 
-        if ( !nome || !email || !password) {
+        if ( !nome || !email || !password || !clinic_id) {
             return res.status(400).json({
-                error: 'nome, e-mail e senha são obrigatórios'
+                error: 'nome, e-mail, senha e ID da clínica são obrigatórios'
             });
         }
 
@@ -22,7 +22,7 @@ const registro = async (req, res) => {
             email,
             hashpassword,
             role,
-            null
+            clinic_id
         );
 
         return res.status(201).json({
@@ -46,7 +46,7 @@ async function login(req, res) {
     const user = await User.login(email, password);
 
     const token = jwt.sign(
-        { id: user.id, email: user.email},
+        { id: user.id, email: user.email, clinic_id: user.clinic_id, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
     );

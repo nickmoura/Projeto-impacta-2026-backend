@@ -22,7 +22,6 @@ model Clinic {
 
   users       User[]
   doctors     Doctor[]
-  patients    Patient[]
   appointments Appointment[]
 }
 
@@ -32,10 +31,11 @@ model User {
   email     String   @unique
   password  String
   role      String
-  clinic_id Int?
+  clinic_id Int
 
   clinic   Clinic? @relation(fields: [clinic_id], references: [id])
   doctor   Doctor?
+  patient  Patient?
   appointments Appointment[] @relation("CreatedAppointments")
 }
 
@@ -56,10 +56,10 @@ model Patient {
   nome      String
   email     String @unique
   telefone  String
-  endereco  String
-  clinic_id Int
+  
+  user_id   Int     @unique
+  user      User    @relation(fields: [user_id], references: [id])
 
-  clinic     Clinic @relation(fields: [clinic_id], references: [id])
   appointments Appointment[]
 }
 
