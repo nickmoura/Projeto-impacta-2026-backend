@@ -85,7 +85,7 @@ class PatientController {
                 });
             }
 
-            const result = await PatientService.patchPatient(patient_id, {
+            const result = await PatientService.patchPatientById(patient_id, {
                 nome,
                 email,
                 telefone,

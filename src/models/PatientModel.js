@@ -20,7 +20,7 @@ const Patient = {
 
     getPatientsByClinic: async (clinic_id) => {
         const [rows] = await pool.query(`
-            SELECT p.*,
+            SELECT p.*
             FROM Patient p
             JOIN User u ON p.user_id = u.id
             WHERE u.clinic_id = ?
