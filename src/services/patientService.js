@@ -47,6 +47,45 @@ class PatientService {
                 throw error;
         }
     }
+
+    async PutPacientById(patient_id, data) {
+
+        const {nome, email, telefone, password} = data;
+
+        if (!patient_id || !nome || !email || !telefone || !password) {
+            throw new Error("ID do paciente e dados são obrigatórios");
+        }
+
+        try {
+            const patient =await Patient.putPatientbyId(patient_id, {
+                nome,
+                telefone
+            });
+
+            const [rows] =await pool.query(
+                "SELECT user_id FROM Patient WHERE id = ?",
+                [patient_id]
+            );
+
+            if (!rows.length) {
+                throw new Error("Paciente não encontrado");
+            }
+
+            const user_id = rows[0].user_id;
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            await User.putPatientbyId(user_id, {
+                nome,
+                email,
+                password: hashedPassword
+            });
+
+            return {message: "Paciente atualizado com sucesso"};
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default new PatientService();

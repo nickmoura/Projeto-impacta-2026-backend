@@ -27,6 +27,20 @@ const Patient = {
         `, [clinic_id]);
 
         return rows;
+    },
+
+    putPatientbyId: async (patient_id, data) => {
+        const { nome, telefone} = data;
+
+        const query = `UPDATE Patient SET nome = ?, telefone = ? WHERE id = ?`;
+
+        const [result] = await pool.query(query, [
+            nome, 
+            telefone, 
+            patient_id
+        ]);
+        
+        return result;
     }
 };
 

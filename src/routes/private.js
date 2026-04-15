@@ -16,5 +16,7 @@ router.put('/appointments/:id', authMiddleware, appointmentController.updateAppo
 router.delete('/appointments/:id', authMiddleware, appointmentController.cancelAppointment);
 
 router.post('/patients', authMiddleware, patientController.createPatient);
+router.put('/patients/:patient_id', authMiddleware, patientController.PutPacientById);
+router.patch('/patients/:patient_id', authMiddleware, patientController.patchPatient);
 
 export default router;
