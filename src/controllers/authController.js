@@ -1,21 +1,17 @@
 import User from "../models/UserModel.js"; 
-import Clinic from "../models/ClinicModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const registro = async (req, res) => {
     try {
-        const { nome, email, password, cnpj } = req.body; 
+        const { nome, email, password } = req.body; 
 
-        if ( !nome || !email || !password || !cnpj) {
+        if ( !nome || !email || !password) {
             return res.status(400).json({
-                error: 'nome, e-mail, senha e CNPJ são obrigatórios'
+                error: 'nome, e-mail e senha são obrigatórios'
             });
         }
 
-        // Buscar clinic_id pelo CNPJ
-        const clinic = await Clinic.getClinicByCNPJ(cnpj);
-        const clinic_id = clinic.id;
 
         const hashpassword = await bcrypt.hash(password, 10);
 
@@ -26,7 +22,7 @@ const registro = async (req, res) => {
             email,
             hashpassword,
             role,
-            clinic_id
+            null
         );
 
         return res.status(201).json({
