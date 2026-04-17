@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { registro, login} from "../src/controllers/authController.js";
 import User from "../src/models/UserModel.js";
-import Clinic from "../src/models/ClinicModel.js";
 
 
 jest.mock("../src/models/UserModel.js", () => ({
@@ -10,13 +9,6 @@ jest.mock("../src/models/UserModel.js", () => ({
   default: {
     createNewUser: jest.fn(),
     login: jest.fn(),
-  },
-}));
-
-jest.mock("../src/models/ClinicModel.js", () => ({
-  __esModule: true,
-  default: {
-    getClinicByCNPJ: jest.fn(),
   },
 }));
 
@@ -44,7 +36,6 @@ describe("AuthController - registro", () => {
         nome: "Lucas",
         email: "lucas@email.com",
         password: "123456",
-        cnpj: "12345678000123",
       },
     };
 
@@ -63,24 +54,21 @@ describe("AuthController - registro", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      error: "nome, e-mail, senha e CNPJ são obrigatórios",
+      error: "nome, e-mail e senha são obrigatórios",
     });
   });
 
   it("deve registrar usuário com sucesso", async () => {
     bcrypt.hash.mockResolvedValue("hashFake");
-    Clinic.getClinicByCNPJ.mockResolvedValue({ id: 1, nome: "Clínica Teste" });
 
     User.createNewUser.mockResolvedValue({
       id: 1,
       nome: "Lucas",
       email: "lucas@email.com",
-      clinic_id: 1,
     });
 
     await registro(req, res);
 
-    expect(Clinic.getClinicByCNPJ).toHaveBeenCalledWith("12345678000123");
     expect(bcrypt.hash).toHaveBeenCalledWith("123456", 10);
 
     expect(User.createNewUser).toHaveBeenCalledWith(
@@ -88,7 +76,7 @@ describe("AuthController - registro", () => {
       "lucas@email.com",
       "hashFake",
       "user",
-      1
+      null
     );
 
     expect(res.status).toHaveBeenCalledWith(201);
