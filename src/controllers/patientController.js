@@ -3,32 +3,41 @@ import PatientService from '../services/patientService.js';
 class PatientController {
 
     async createPatient(req, res) {
-        // seu código...
-    }
-
-    async deletePatient(req, res) {
-        const { id } = req.params;
-
         try {
-            const result = await PatientService.deletePatient(id);
-
-            if (!result) {
-                return res.status(404).json({
-                    message: "Paciente não encontrado"
+            const {nome, email, telefone, password} = req.body;
+            
+            if (!req.user || !req.user.clinic_id) {
+                return res.status(400).json({
+                    message: "Usuário autenticado nao esta vinculado a uma clinica"
                 });
             }
 
-            return res.status(200).json({
-                message: "Paciente deletado com sucesso"
+            const clinic_id = req.user.clinic_id;
+
+            const patient = await PatientService.createPatient({
+                nome,
+                email,
+                telefone,
+                password,
+                clinic_id
             });
 
-        } catch (error) {
-            console.error("ERRO AO DELETAR PACIENTE:", error);
+            return res.status(201).json({
+                message: "Paciente criado com sucesso",
+                patient
+            });
 
+        }catch (error) {
+            if (error.code === "EMAIL_ALREADY_EXISTS") {
+                return res.status(400).json({
+                    message: "O email já está em uso por outro paciente"
+                });
+            }
+            
             return res.status(500).json({
-                message: "Erro ao deletar paciente",
+                message: "Erro ao criar paciente",
                 error: error.message
-            });
+            })
         }
     }
 
@@ -114,6 +123,32 @@ class PatientController {
         } catch (error) {
             return res.status(400).json({
                 message: "Erro ao atualizar paciente",
+                error: error.message
+            });
+        }
+    }
+
+    async deletePatient(req, res) {
+        const { id } = req.params;
+
+        try {
+            const result = await PatientService.deletePatient(id);
+
+            if (!result) {
+                return res.status(404).json({
+                    message: "Paciente não encontrado"
+                });
+            }
+
+            return res.status(200).json({
+                message: "Paciente deletado com sucesso"
+            });
+
+        } catch (error) {
+            console.error("ERRO AO DELETAR PACIENTE:", error);
+
+            return res.status(500).json({
+                message: "Erro ao deletar paciente",
                 error: error.message
             });
         }
