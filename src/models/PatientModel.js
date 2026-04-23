@@ -2,10 +2,11 @@ import pool from "../config/db.js";
 
 const Patient = {
 
-    createPatient: async (nome, telefone, user_id) => {
-        const query = `INSERT INTO Patient (nome, telefone, user_id) values (?, ?, ?)`;
+    createPatient: async (nome, email, telefone, user_id) => {
+        const query = `INSERT INTO Patient (nome, email, telefone, user_id) values (?, ?, ?, ?)`;
         const [result] = await pool.query(query, [
             nome,
+            email,
             telefone,
             user_id,
         ]);
@@ -13,6 +14,7 @@ const Patient = {
         return {
             patient_id: result.insertId,
             nome,
+            email,
             telefone,
             user_id
         };

@@ -40,6 +40,32 @@ class PatientController {
         }
     }
 
+    async getPatients(req, res) {
+
+        try {
+            if (!req.user || !req.user.clinic_id) {
+                return res.status(400).json({
+                    message: "Usuário autenticado nao esta vinculado a uma clinica"
+                });
+            }
+
+            const clinic_id = req.user.clinic_id;
+
+            const patients = await PatientService.getPatientsByClinicId(clinic_id);
+
+            return res.status(200).json({
+                message: "Pacientes listados com sucesso",
+                patients
+            });
+
+        } catch (error) {
+            return res.status(500).json({
+                message: "Erro ao buscar pacientes",
+                error: error.message
+            });
+        }
+    }
+
     async PutPacientById(req, res) {
         try {
             const { patient_id } = req.params;

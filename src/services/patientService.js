@@ -27,6 +27,7 @@ class PatientService {
 
             const patient = await Patient.createPatient(
                 nome,
+                email,
                 telefone,
                 user.id,
             );
@@ -45,6 +46,18 @@ class PatientService {
                 throw err;
             }
                 throw error;
+        }
+    }
+
+    async getPatientsByClinicId(clinic_id) {
+        try {
+            const [rows] = await pool.query(
+                "SELECT p.* FROM Patient p JOIN User u ON p.user_id = u.id WHERE u.clinic_id = ?",
+                [clinic_id]
+            );
+            return rows;
+        } catch (error) {
+            throw error;
         }
     }
 
