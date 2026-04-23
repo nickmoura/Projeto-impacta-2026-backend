@@ -43,6 +43,27 @@ const User = {
         }
 
         return user;
+    },
+
+    getUserByEmail: async (email) => {
+        const [rows] = await pool.query("SELECT * FROM User WHERE email = ?", [email]);
+
+        return rows[0];
+    },
+
+    putUserById: async (user_id, data) => {
+        const { nome, email, password} = data;
+
+        const query = `UPDATE User SET nome = ?, email = ?, password = ? WHERE id = ?`;
+
+        const [result] =await pool.query(query, [
+            nome,
+            email,
+            password,
+            user_id
+        ]);
+
+        return result;
     }
 };
 

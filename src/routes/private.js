@@ -18,6 +18,9 @@ router.delete('/appointments/:id', authMiddleware, appointmentController.cancelA
 
 // Patients
 router.post('/patients', authMiddleware, patientController.createPatient);
+router.get('/patients', authMiddleware, patientController.getPatients);
+router.put('/patients/:patient_id', authMiddleware, patientController.PutPacientById);
+router.patch('/patients/:patient_id', authMiddleware, patientController.patchPatient);
 
 // 🔥 AQUI está sem autenticação (pra teste)
 router.delete('/patients/:id', patientController.deletePatient);
