@@ -13,17 +13,11 @@ jest.mock("../src/models/UserModel.js", () => ({
 }));
 
 jest.mock("bcrypt", () => ({
-  __esModule: true,
-  default: {
     hash: jest.fn(),
-  },
-}));
+  }));
 
 jest.mock("jsonwebtoken", () => ({
-  __esModule: true,
-  default: {
     sign: jest.fn(),
-  },
 }));
 
 describe("AuthController - registro", () => {
@@ -36,6 +30,7 @@ describe("AuthController - registro", () => {
         nome: "Lucas",
         email: "lucas@email.com",
         password: "123456",
+        clinic_id: 1,
       },
     };
 
@@ -54,7 +49,7 @@ describe("AuthController - registro", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      error: "nome, e-mail e senha são obrigatórios",
+      error: "nome, e-mail, senha e ID da clínica são obrigatórios",
     });
   });
 
@@ -76,7 +71,7 @@ describe("AuthController - registro", () => {
       "lucas@email.com",
       "hashFake",
       "user",
-      null
+      1
     );
 
     expect(res.status).toHaveBeenCalledWith(201);
@@ -87,6 +82,13 @@ describe("AuthController - registro", () => {
   });
 
   it("deve retornar 500 se ocorrer erro", async () => {
+    req.body = {
+      nome: "Lucas",
+      email: "lucas@email.com",
+      password: "123456",
+      clinic_id: 1,
+    };
+
     bcrypt.hash.mockRejectedValue(new Error("Erro interno"));
 
     await registro(req, res);
