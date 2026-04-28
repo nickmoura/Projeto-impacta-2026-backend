@@ -51,21 +51,6 @@ class PatientService {
         }
     }
 
-    // 🔥 SEU DELETE COMPLETO
-    async deletePatient(id) {
-        try {
-            const result = await pool.query(
-                "DELETE FROM paciente WHERE id = ?", [id]
-            );
-
-            return result[0].affectedRows > 0;
-
-        } catch (error) {
-            console.error("ERRO NO SERVICE AO DELETAR:", error);
-            throw error;
-        }
-    }
-
     async getPatientsByClinicId(clinic_id) {
         try {
             const [rows] = await pool.query(
@@ -176,6 +161,23 @@ class PatientService {
 
         return {message: "Paciente atualizado parcialmente com sucesso"};
     }
+
+    async deletePatient(id) {
+        if (!id) {
+            throw new Error("ID do paciente é obrigatório");
+        }
+
+        const patient = await Patient.getPatientById(id);
+
+        if (!patient) {
+            return false;
+        }
+
+        await User.deleteUserById(patient.user_id);
+
+        return true;
+    }
+
 }
 
 export default new PatientService();
