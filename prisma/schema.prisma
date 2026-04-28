@@ -58,7 +58,7 @@ model Patient {
   telefone  String
   
   user_id   Int     @unique
-  user      User    @relation(fields: [user_id], references: [id])
+  user      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   appointments Appointment[]
 }

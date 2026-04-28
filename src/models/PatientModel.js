@@ -43,6 +43,16 @@ const Patient = {
         ]);
         
         return result;
+    },
+
+    getPatientById: async (patient_id) => {
+        const [rows] = await pool.query("SELECT * FROM Patient WHERE id = ?", [patient_id]);
+        return rows[0];
+    },
+
+    deletePatientById: async (patient_id) => {
+        const [result] = await pool.query("DELETE FROM Patient WHERE id = ?", [patient_id]);
+        return result;
     }
 };
 

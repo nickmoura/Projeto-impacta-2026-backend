@@ -3,10 +3,10 @@ import User from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import pool from "../config/db.js";
 
-
 class PatientService {
+
     async createPatient(data) {
-        const {nome, email, telefone, password, clinic_id} = data;
+        const { nome, email, telefone, password, clinic_id } = data;
 
         if (!nome || !email || !telefone || !password || !clinic_id) {
             throw new Error("Todos os campos são obrigatórios");
@@ -36,16 +36,18 @@ class PatientService {
 
         } catch (error) {
 
+            // rollback se der erro
             if (user) {
                 await pool.query("DELETE FROM User WHERE id = ?", [user.id]);
             }
-            
+
             if (error.code === "ER_DUP_ENTRY" || error.errno === 1062) {
                 const err = new Error("EMAIL_ALREADY_EXISTS");
                 err.code = "EMAIL_ALREADY_EXISTS";
                 throw err;
             }
-                throw error;
+
+            throw error;
         }
     }
 
@@ -159,6 +161,23 @@ class PatientService {
 
         return {message: "Paciente atualizado parcialmente com sucesso"};
     }
+
+    async deletePatient(id) {
+        if (!id) {
+            throw new Error("ID do paciente é obrigatório");
+        }
+
+        const patient = await Patient.getPatientById(id);
+
+        if (!patient) {
+            return false;
+        }
+
+        await User.deleteUserById(patient.user_id);
+
+        return true;
+    }
+
 }
 
 export default new PatientService();
