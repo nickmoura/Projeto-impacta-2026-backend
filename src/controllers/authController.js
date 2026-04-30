@@ -4,13 +4,16 @@ import jwt from "jsonwebtoken";
 
 const registro = async (req, res) => {
     try {
-        const { nome, email, password, clinic_id } = req.body; 
+          const { nome, email, password, cnpj } = req.body; 
 
-        if ( !nome || !email || !password || !clinic_id) {
+        if ( !nome || !email || !password || !cnpj) {
             return res.status(400).json({
-                error: 'nome, e-mail, senha e ID da clínica são obrigatórios'
+                error: 'nome, e-mail, senha e CNPJ são obrigatórios'
             });
         }
+
+        const clinic = await Clinic.getClinicByCNPJ(cnpj);
+        const clinic_id = clinic.id;
 
 
         const hashpassword = await bcrypt.hash(password, 10);
