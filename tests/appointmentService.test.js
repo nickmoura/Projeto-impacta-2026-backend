@@ -4,8 +4,9 @@ import Appointment from '../src/models/AppointmentModel.js';
 
 jest.mock('../src/models/AppointmentModel.js', () => ({
     createAppointment: jest.fn(),
-    cancelAppointmentById: jest.fn(),
     getAppointmentByUser: jest.fn(),
+    updateAppointmentById: jest.fn(),
+    cancelAppointmentById: jest.fn(),
 }));
 
 describe("AppointmentService - createAppointment", () => {
@@ -113,6 +114,53 @@ describe("AppointmentService - getAppointmentByUser", () => {
     });
 });
 
+describe("appointmentService - updateAppointmentStatus", () => {
+    it("deve atualizar o status com sucesso", async () => {
+        Appointment.updateAppointmentById.mockResolvedValue({ id: 1, status: "completed" });  
+    });
+
+    it("deve lançar erro se nao passar ID", async () => {
+        await expect(
+            appointmentService.updateAppointment(null, {})
+        ).rejects.toThrow("ID da consulta é obrigatório");
+    });
+
+    it("deve lançar erro se nao passar ID", async () => {
+        await expect(
+            appointmentService.updateAppointment(null, "completed")
+        ).rejects.toThrow("ID da consulta é obrigatório");
+    });
+
+    it("deve atualizar consulta com sucesso", async () => {
+        const updateMock = { id: 1, status: "updated"};
+
+        Appointment.updateAppointmentById.mockResolvedValue(updateMock);
+
+        const result = await appointmentService.updateAppointment(1, {status: "updated"});
+
+        expect(result).toEqual(updateMock);
+        expect(Appointment.updateAppointmentById).toHaveBeenCalledWith(1, {status: "updated"});
+    });
+
+    it("deve lancar erro de duplicidade ao atualizar", async () => {
+        Appointment.updateAppointmentById.mockRejectedValue({
+            code: "ER_DUP_ENTRY"
+        });
+
+        await expect(
+            appointmentService.updateAppointment(1, {})
+        ).rejects.toMatchObject({ code: "DUPLICATE_APPOINTMENT" });
+    });
+
+    it("deve lancar erro genérico ao atualizar", async () => {
+        Appointment.updateAppointmentById.mockRejectedValue(new Error("erro qualquer"));
+
+        await expect(
+            appointmentService.updateAppointment(1, {})
+        ).rejects.toThrow("erro qualquer");
+    });
+});
+
 describe("AppointmentService - cancelAppointment", () => {
     it("deve cancelar com sucesso", async () => {
         Appointment.cancelAppointmentById.mockResolvedValue({ id: 1 });
@@ -130,5 +178,11 @@ describe("AppointmentService - cancelAppointment", () => {
         await expect(
             appointmentService.cancelAppointment(1)
         ).rejects.toThrow("Erro interno ao cancelar consulta");
+    });
+
+    it("deve lancar erro se nao passar ID ao cancelar", async () =>{
+        await expect(
+            appointmentService.cancelAppointment(null)
+        ).rejects.toThrow("ID da consulta é obrigatório");
     });
 });
