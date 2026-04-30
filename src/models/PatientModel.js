@@ -2,14 +2,13 @@ import pool from "../config/db.js";
 
 const Patient = {
 
-    createPatient: async (nome, email, telefone, endereco, clinic_id) => {
-        const query = `INSERT INTO Patient (nome, email, telefone, endereco, clinic_id) values (?, ?, ?, ?, ?)`;
+    createPatient: async (nome, email, telefone, user_id) => {
+        const query = `INSERT INTO Patient (nome, email, telefone, user_id) values (?, ?, ?, ?)`;
         const [result] = await pool.query(query, [
             nome,
             email,
             telefone,
-            endereco,
-            clinic_id
+            user_id,
         ]);
 
         return {
@@ -17,19 +16,43 @@ const Patient = {
             nome,
             email,
             telefone,
-            endereco,
-            clinic_id
+            user_id
         };
     },
 
     getPatientsByClinic: async (clinic_id) => {
-        const [rows] = await pool.query(
-            "SELECT * FROM Patient WHERE clinic_id = ?",
-            [clinic_id]
-        );
+        const [rows] = await pool.query(`
+            SELECT p.*
+            FROM Patient p
+            JOIN User u ON p.user_id = u.id
+            WHERE u.clinic_id = ?
+        `, [clinic_id]);
 
         return rows;
+    },
 
+    putPatientbyId: async (patient_id, data) => {
+        const { nome, telefone} = data;
+
+        const query = `UPDATE Patient SET nome = ?, telefone = ? WHERE id = ?`;
+
+        const [result] = await pool.query(query, [
+            nome, 
+            telefone, 
+            patient_id
+        ]);
+        
+        return result;
+    },
+
+    getPatientById: async (patient_id) => {
+        const [rows] = await pool.query("SELECT * FROM Patient WHERE id = ?", [patient_id]);
+        return rows[0];
+    },
+
+    deletePatientById: async (patient_id) => {
+        const [result] = await pool.query("DELETE FROM Patient WHERE id = ?", [patient_id]);
+        return result;
     }
 };
 

@@ -106,7 +106,7 @@ it("deve retornar 200 quando result nao tem alredyCancelled", async () => {
 });
 
 it("retorna 404 quando result é null", async () => {
-    const req = { params: { appointment_id: '1'}};
+    const req = { params: { id: '1'}};
     const res = mockResponse();
 
     appointmentService.cancelAppointment.mockResolvedValue(null);
@@ -120,7 +120,7 @@ it("retorna 404 quando result é null", async () => {
 });
 
 it("retorna 400 quando result tem alreadyCancelled", async () => {
-    const req = { params: { appointment_id: '1'}};
+    const req = { params: { id: '1'}};
     const res = mockResponse();
 
     appointmentService.cancelAppointment.mockResolvedValue({ alreadyCancelled: true });
@@ -134,7 +134,7 @@ it("retorna 400 quando result tem alreadyCancelled", async () => {
 });
 
 it("retorna 200 quando cancelamento é sucesso", async () => {
-    const req = { params: { appointment_id: '1'}};
+    const req = { params: { id: '1'}};
     const res = mockResponse();
 
     appointmentService.cancelAppointment.mockResolvedValue({
@@ -150,7 +150,7 @@ it("retorna 200 quando cancelamento é sucesso", async () => {
 });
 
 it("retorna 500 para erro interno", async () => {
-    const req = { params: { appointment_id: '1'}};
+    const req = { params: { id: '1'}};
     const res = mockResponse();
 
     appointmentService.cancelAppointment.mockRejectedValue(
@@ -225,4 +225,122 @@ describe("getAppointments", () => {
         });
     });
 
+    it("deve retornar 500 quando update falha", async () => {
+    const req = {
+        params: { id: '1' },
+        body: {},
+        user: { id: 1 }
+    };
+
+    const res = mockResponse();
+
+    appointmentService.updateAppointment.mockRejectedValue(
+        new Error("erro inesperado")
+    );
+
+    await appointmentController.updateAppointment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+        error: "Erro interno ao atualizar consulta"
+    });
 });
+
+    describe("updateAppointment", () => {
+
+    it("deve retornar 200 ao atualizar consulta", async () => {
+        const req = {
+            params: { id: "1" },
+            body: { status: "updated" },
+            user: { id: 1 }
+        };
+        const res = mockResponse();
+
+        appointmentService.updateAppointment.mockResolvedValue({
+            id: 1,
+            status: "updated"
+        });
+
+        await appointmentController.updateAppointment(req, res);
+
+        expect(appointmentService.updateAppointment).toHaveBeenCalledWith(
+            "1",
+            expect.objectContaining({
+                status: "updated",
+                updated_by: 1
+            })
+        );
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it("deve retornar 404 quando consulta nao existe", async () => {
+        const req = {
+            params: { id: "1" },
+            body: {},
+            user: { id: 1 }
+        };
+        const res = mockResponse();
+
+        appointmentService.updateAppointment.mockResolvedValue(null);
+
+        await appointmentController.updateAppointment(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    it("deve retornar 409 para conflito", async () => {
+        const req = {
+            params: { id: "1" },
+            body: {},
+            user: { id: 1 }
+        };
+        const res = mockResponse();
+
+        const error = new Error();
+        error.code = "DUPLICATE_APPOINTMENT";
+
+        appointmentService.updateAppointment.mockRejectedValue(error);
+
+        await appointmentController.updateAppointment(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(409);
+    });
+
+    it("deve retornar 400 se faltar campos", async () => {
+        const req = {
+            params: { id: "1" },
+            body: {},
+            user: { id: 1 }
+        };
+        const res = mockResponse();
+
+        appointmentService.updateAppointment.mockRejectedValue(
+            new Error("todos os campos são obrigatórios")
+        );
+
+        await appointmentController.updateAppointment(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+    });
+
+    it("deve retornar 500 para erro interno", async () => {
+        const req = {
+            params: { id: "1" },
+            body: {},
+            user: { id: 1 }
+        };
+        const res = mockResponse();
+
+        appointmentService.updateAppointment.mockRejectedValue(
+            new Error("erro qualquer")
+        );
+
+        await appointmentController.updateAppointment(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+  });
+
+}); 
