@@ -1,4 +1,5 @@
 import Doctor from '../models/DoctorModel.js';
+import Clinic from '../models/ClinicModel.js';
 import User from '../models/UserModel.js';
 import bcrypt from 'bcrypt';
 import pool from '../config/db.js';
@@ -6,33 +7,41 @@ import pool from '../config/db.js';
 
 class DoctorService {
     async createDoctor(data) {
-        const { doctor, email, telefone, password, clinic_id,  specialty, crm } = data;
+        const { doctor: name, email, telefone, password, cnpj,  specialty, crm } = data;
 
-        if (!doctor || !email || !telefone || !password || !clinic_id || !specialty || !crm) {
+        if (!name || !email || !telefone || !password || !cnpj || !specialty || !crm) {
             throw new Error("Todos os campos sao obrigatórios");
         }
 
         let user;
 
         try {
+            const clinic = await Clinic.getClinicByCNPJ(cnpj);
+
+            if (!clinic) {
+                throw new Error("Clínica não encontrada com o CNPJ fornecido");
+            }
+            
+            const clinic_id = clinic.id;
+
             const hashedPassword = await bcrypt.hash(password, 10);
 
             user = await User.createNewUser(
-                doctor,
+                name,
                 email,
                 hashedPassword,
                 "doctor",
                 clinic_id
             );
 
-            const doctor = await Doctor.createDoctor(
+            const newDoctor = await Doctor.createDoctor(
               user.id,
               clinic_id,
               crm,
               specialty
             );
 
-            return doctor;
+            return newDoctor;
 
         } catch (error) {
            if (user) {
