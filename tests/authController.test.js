@@ -2,7 +2,15 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { registro, login} from "../src/controllers/authController.js";
 import User from "../src/models/UserModel.js";
+import Clinic from "../src/models/ClinicModel.js";
 
+
+jest.mock("../src/models/ClinicModel.js", () => ({
+  __esModule: true,
+  default: {
+    getClinicByCNPJ: jest.fn(),
+  },
+}));
 
 jest.mock("../src/models/UserModel.js", () => ({
   __esModule: true,
@@ -30,7 +38,7 @@ describe("AuthController - registro", () => {
         nome: "Lucas",
         email: "lucas@email.com",
         password: "123456",
-        clinic_id: 1,
+        cnpj: "12345678901234",
       },
     };
 
@@ -49,12 +57,14 @@ describe("AuthController - registro", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      error: "nome, e-mail, senha e ID da clínica são obrigatórios",
+      error: "nome, e-mail, senha e cnpj são obrigatórios",
     });
   });
 
   it("deve registrar usuário com sucesso", async () => {
     bcrypt.hash.mockResolvedValue("hashFake");
+
+    Clinic.getClinicByCNPJ.mockResolvedValue({ id: 1 });
 
     User.createNewUser.mockResolvedValue({
       id: 1,
@@ -86,7 +96,7 @@ describe("AuthController - registro", () => {
       nome: "Lucas",
       email: "lucas@email.com",
       password: "123456",
-      clinic_id: 1,
+      cnpj: "12345678901234",
     };
 
     bcrypt.hash.mockRejectedValue(new Error("Erro interno"));
