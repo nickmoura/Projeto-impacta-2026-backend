@@ -1,4 +1,5 @@
-import User from "../models/UserModel.js"; 
+import User from "../models/UserModel.js";
+import Clinic from "../models/ClinicModel.js"; 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -8,7 +9,7 @@ const registro = async (req, res) => {
 
         if ( !nome || !email || !password || !cnpj) {
             return res.status(400).json({
-                error: 'nome, e-mail, senha e CNPJ são obrigatórios'
+                error: 'nome, e-mail, senha e cnpj são obrigatórios'
             });
         }
 
