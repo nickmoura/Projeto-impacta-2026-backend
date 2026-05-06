@@ -52,32 +52,25 @@ class PatientService {
     }
 
     async getPatientsByClinicId(clinic_id) {
-        try {
-            const [rows] = await pool.query(
-                "SELECT p.* FROM Patient p JOIN User u ON p.user_id = u.id WHERE u.clinic_id = ?",
-                [clinic_id]
-            );
-            return rows;
-        } catch (error) {
-            throw error;
-        }
+        const rows = await Patient.getPatientsByClinic(clinic_id); // ← usa o model que já existe
+        return rows;
     }
 
     async PutPacientById(patient_id, data) {
 
-        const {nome, email, telefone, password} = data;
+        const { nome, email, telefone, password } = data;
 
         if (!patient_id || !nome || !email || !telefone || !password) {
             throw new Error("ID do paciente e dados são obrigatórios");
         }
 
         try {
-            const patient =await Patient.putPatientbyId(patient_id, {
+            const patient = await Patient.putPatientbyId(patient_id, {
                 nome,
                 telefone
             });
 
-            const [rows] =await pool.query(
+            const [rows] = await pool.query(
                 "SELECT user_id FROM Patient WHERE id = ?",
                 [patient_id]
             );
@@ -96,14 +89,14 @@ class PatientService {
                 password: hashedPassword
             });
 
-            return {message: "Paciente atualizado com sucesso"};
+            return { message: "Paciente atualizado com sucesso" };
         } catch (error) {
             throw error;
         }
     }
 
     async patchPatientById(patient_id, data) {
-        const { nome, email, telefone, password} = data;
+        const { nome, email, telefone, password } = data;
 
         if (!patient_id) {
             throw new Error("ID do paciente é obrigatório");
@@ -148,7 +141,7 @@ class PatientService {
         }
 
         let novaSenha = userAtual.password;
-        
+
         if (password) {
             novaSenha = await bcrypt.hash(password, 10);
         }
@@ -159,7 +152,7 @@ class PatientService {
             password: novaSenha
         });
 
-        return {message: "Paciente atualizado parcialmente com sucesso"};
+        return { message: "Paciente atualizado parcialmente com sucesso" };
     }
 
     async deletePatient(id) {
