@@ -1,65 +1,82 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const db = require('../config/database');
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import db from "../config/db.js";
+import Clinic from "../models/ClinicModel.js";
 
-// Função para registrar usuário
-async function register(name, email, password) {
-  // Verifica se já existe usuário
-  const [existingUser] = await db.execute(
-    'SELECT * FROM users WHERE email = ?',
-    [email]
-  );
+class AuthService {
+  async register(nome, email, password, cnpj) {
+    const [existingUser] = await db.execute(
+      "SELECT * FROM User WHERE email = ?",
+      [email]
+    );
 
-  if (existingUser.length > 0) {
-    throw new Error('Usuário já existe');
+    if (existingUser.length > 0) {
+      throw new Error("Usuário já existe");
+    }
+
+    const clinic = await Clinic.getClinicByCNPJ(cnpj);
+
+    if (!clinic) {
+      throw new Error("Clínica não encontrada");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const role = "user";
+
+    const [result] = await db.execute(
+      `INSERT INTO User (nome, email, password, role, clinic_id)
+       VALUES (?, ?, ?, ?, ?)`,
+      [nome, email, hashedPassword, role, clinic.id]
+    );
+
+    return {
+      id: result.insertId,
+      nome,
+      email,
+      role,
+      clinic_id: clinic.id
+    };
   }
 
-  // Criptografar senha
-  const hashedPassword = await bcrypt.hash(password, 10);
+  async login(email, password) {
+    const [users] = await db.execute(
+      "SELECT * FROM User WHERE email = ?",
+      [email]
+    );
 
-  // Inserir no banco
-  await db.execute(
-    'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-    [name, email, hashedPassword]
-  );
+    if (users.length === 0) {
+      throw new Error("Usuário não encontrado");
+    }
 
-  return { message: 'Usuário registrado com sucesso' };
+    const user = users[0];
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new Error("Senha inválida");
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        clinic_id: user.clinic_id,
+        role: user.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        clinic_id: user.clinic_id,
+        role: user.role
+      }
+    };
+  }
 }
 
-// Função de login
-async function login(email, password) {
-  const [users] = await db.execute(
-    'SELECT * FROM users WHERE email = ?',
-    [email]
-  );
-
-  if (users.length === 0) {
-    throw new Error('Usuário não encontrado');
-  }
-
-  const user = users[0];
-
-  // Comparar senha
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-
-  if (!isPasswordValid) {
-    throw new Error('Senha inválida');
-  }
-
-  // Gerar token JWT
-  const token = jwt.sign(
-    { id: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: '1h' }
-  );
-
-  return {
-    message: 'Login realizado com sucesso',
-    token
-  };
-}
-
-module.exports = {
-  register,
-  login
-};
+export default new AuthService();
