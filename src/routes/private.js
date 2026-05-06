@@ -25,5 +25,6 @@ router.patch('/patients/:patient_id', authMiddleware, patientController.patchPat
 router.delete('/patients/:id', authMiddleware, patientController.deletePatient);
 
 router.post('/doctors', authMiddleware, doctorController.createDoctor);
+router.get('/doctors/:doctor_id', authMiddleware, doctorController.getDoctor);
 
 export default router;

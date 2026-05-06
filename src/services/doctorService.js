@@ -57,5 +57,15 @@ class DoctorService {
             throw error;
         }
     }
+
+    async getDoctor_by_id(doctor_id) {
+        const doctor = await Doctor.getDoctorById(doctor_id);
+
+        if (!doctor) {
+            throw new Error("Médico não encontrado");
+        }
+
+        return doctor;
+    }
 }
 export default new DoctorService();
