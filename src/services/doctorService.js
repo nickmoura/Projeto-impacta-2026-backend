@@ -67,5 +67,19 @@ class DoctorService {
 
         return doctor;
     }
+
+    async putDoctor_by_id(doctor_id, data) {
+        const doctorExists = await Doctor.putDoctorById(doctor_id, data);
+
+        if (!doctorExists) {
+            throw new Error("Médico não encontrado");
+        }
+
+        await Doctor.putDoctorById(doctor_id, data);
+
+        const updatedDoctor = await Doctor.getDoctorById(doctor_id);
+
+        return updatedDoctor;
+    }
 }
 export default new DoctorService();
