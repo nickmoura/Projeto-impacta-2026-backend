@@ -77,12 +77,18 @@ class DoctorService {
 
         await Doctor.putDoctorById(doctor_id, data);
 
+        const userData = {
+            nome: data.doctor,
+            email: data.email
+        };
+
+        if (data.password) {
+            userData.password = await bcrypt.hash(data.password, 10);
+        }
+
         await User.putUserById(
             doctorExists.user_id,
-            {
-                nome: data.doctor,
-                email: data.email
-            }
+            userData
         )
 
         const updatedDoctor = await Doctor.getDoctorById(doctor_id);
