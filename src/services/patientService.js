@@ -36,7 +36,7 @@ class PatientService {
 
         } catch (error) {
 
-            // rollback se der erro
+
             if (user) {
                 await pool.query("DELETE FROM User WHERE id = ?", [user.id]);
             }
@@ -52,7 +52,7 @@ class PatientService {
     }
 
     async getPatientsByClinicId(clinic_id) {
-        const rows = await Patient.getPatientsByClinic(clinic_id); // ← usa o model que já existe
+        const rows = await Patient.getPatientsByClinic(clinic_id);
         return rows;
     }
 
