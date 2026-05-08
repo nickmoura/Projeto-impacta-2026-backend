@@ -1,13 +1,13 @@
 import User from "../models/UserModel.js";
-import Clinic from "../models/ClinicModel.js"; 
+import Clinic from "../models/ClinicModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const registro = async (req, res) => {
     try {
-          const { nome, email, password, cnpj } = req.body; 
+        const { nome, email, password, cnpj } = req.body;
 
-        if ( !nome || !email || !password || !cnpj) {
+        if (!nome || !email || !password || !cnpj) {
             return res.status(400).json({
                 error: 'nome, e-mail, senha e cnpj são obrigatórios'
             });
@@ -31,11 +31,11 @@ const registro = async (req, res) => {
 
         return res.status(201).json({
             message: 'Usuário registrado com sucesso!',
-            user:novousuario
+            user: novousuario
         });
-       
-    } catch(error) {
-        console.error(error); 
+
+    } catch (error) {
+        console.error(error);
         return res.status(500).json({
             error: 'Erro ao registrar o usuário'
         });
@@ -44,25 +44,30 @@ const registro = async (req, res) => {
 };
 
 async function login(req, res) {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    const user = await User.login(email, password);
+        const user = await User.login(email, password);
+        console.log('User encontrado no login:', JSON.stringify(user));
+        
+        const token = jwt.sign(
+            { id: user.id, email: user.email, clinic_id: user.clinic_id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
-    const token = jwt.sign(
-        { id: user.id, email: user.email, clinic_id: user.clinic_id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
-    );
+        res.status(200).json({
+            message: "Login realizado com sucesso",
+            token,
+            user: {
+                id: user.id,
+                clinic_id: user.clinic_id
+            }
+        });
 
-    res.status(200).json({ 
-        message: "Login realizado com sucesso",
-        token
-    });
-
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 }
 
 export { registro, login };

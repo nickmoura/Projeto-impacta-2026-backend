@@ -4,8 +4,8 @@ class PatientController {
 
     async createPatient(req, res) {
         try {
-            const {nome, email, telefone, password} = req.body;
-            
+            const { nome, email, telefone, password } = req.body;
+
             if (!req.user || !req.user.clinic_id) {
                 return res.status(400).json({
                     message: "Usuário autenticado nao esta vinculado a uma clinica"
@@ -27,13 +27,13 @@ class PatientController {
                 patient
             });
 
-        }catch (error) {
+        } catch (error) {
             if (error.code === "EMAIL_ALREADY_EXISTS") {
                 return res.status(400).json({
                     message: "O email já está em uso por outro paciente"
                 });
             }
-            
+
             return res.status(500).json({
                 message: "Erro ao criar paciente",
                 error: error.message
@@ -67,10 +67,29 @@ class PatientController {
         }
     }
 
+    async getPatientsByClinic(req, res) {
+        try {
+            const { clinic_id } = req.params;
+
+            if (!clinic_id) {
+                return res.status(400).json({ message: "clinic_id é obrigatório" });
+            }
+
+            const patients = await PatientService.getPatientsByClinicId(Number(clinic_id));
+
+            return res.status(200).json(patients); // retorna array direto, sem wrapper
+        } catch (error) {
+            return res.status(500).json({
+                message: "Erro ao buscar pacientes",
+                error: error.message
+            });
+        }
+    }
+
     async PutPacientById(req, res) {
         try {
             const { patient_id } = req.params;
-            const {nome, email, telefone, password} = req.body;
+            const { nome, email, telefone, password } = req.body;
 
             if (!patient_id || !nome || !email || !telefone || !password) {
                 return res.status(400).json({
@@ -98,9 +117,9 @@ class PatientController {
     async patchPatient(req, res) {
         try {
             const { patient_id } = req.params;
-            const {nome, email, telefone, password} = req.body;
+            const { nome, email, telefone, password } = req.body;
 
-            if(!patient_id) {
+            if (!patient_id) {
                 return res.status(400).json({
                     message: "ID do paciente é obrigatório"
                 });
