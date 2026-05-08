@@ -77,7 +77,7 @@ class PatientController {
 
             const patients = await PatientService.getPatientsByClinicId(Number(clinic_id));
 
-            return res.status(200).json(patients); // retorna array direto, sem wrapper
+            return res.status(200).json(patients);
         } catch (error) {
             return res.status(500).json({
                 message: "Erro ao buscar pacientes",
