@@ -18,6 +18,23 @@ app.use(cors({
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+  const start = Date.now();
+
+  const originalJson = res.json.bind(res);
+  res.json = (body) => {
+    const duration = Date.now() - start;
+    const extra = body && (body.error || body.message)
+      ? ` - ${body.error || body.message}`
+      : '';
+
+    console.log(`${req.method} ${req.originalUrl} ${res.statusCode}${extra} - ${duration}ms`);
+    return originalJson(body);
+  };
+
+  next();
+});
+
 app.use('/api', publicRoutes);
 app.use('/api', privateRoutes);
 
