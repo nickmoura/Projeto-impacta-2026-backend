@@ -95,5 +95,17 @@ class DoctorService {
 
         return updatedDoctor;
     }
+
+    async deleteDoctor_by_id(doctor_id) {
+        const doctorExists = await Doctor.getDoctorById(doctor_id);
+
+        if (!doctorExists) {
+            throw new Error("Médico não encontrado");
+        }
+
+        await Doctor.deleteDoctorById(doctor_id);
+
+        await User.deleteUserById(doctorExists.user_id);
+    }
 }
 export default new DoctorService();

@@ -65,6 +65,11 @@ const Doctor =  {
         ]);
 
         return result
+    },
+
+    deleteDoctorById: async (doctor_id) => {
+        const query = `DELETE FROM Doctor WHERE id = ?`;
+        await pool.query(query, [doctor_id]);
     }
 };
 
