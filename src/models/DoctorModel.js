@@ -29,6 +29,47 @@ const Doctor =  {
         );
 
         return rows;
+    },
+
+    getDoctorById: async (doctor_id) => {
+        const [rows] = await pool.query(
+             `SELECT
+                d.id AS doctor_id,
+                d.user_id,
+                d.clinic_id,
+                d.crm,
+                d.specialty,
+                u.nome,
+                u.email
+            FROM Doctor d
+            JOIN User u ON d.user_id = u.id
+            WHERE d.id = ?`,
+            [doctor_id]
+        );
+        return rows.length ? rows[0] : null;
+    },
+
+    putDoctorById: async (doctor_id, data) => {
+        const { crm, specialty } = data;
+
+        const query = `
+            UPDATE Doctor 
+            SET crm = ?, specialty = ? 
+            WHERE id = ?
+        `;
+
+        const [result] = await pool.query(query, [
+            crm, 
+            specialty, 
+            doctor_id
+        ]);
+
+        return result
+    },
+
+    deleteDoctorById: async (doctor_id) => {
+        const query = `DELETE FROM Doctor WHERE id = ?`;
+        await pool.query(query, [doctor_id]);
     }
 };
 
