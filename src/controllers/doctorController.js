@@ -55,6 +55,20 @@ class DoctorController {
             });
         }
     }
+
+    async deleteDoctor(req, res) {
+        try {
+            const { doctor_id } = req.params;
+
+            await doctorService.deleteDoctor_by_id(doctor_id);
+
+            return res.status(204).send();
+        } catch (error) {
+            return res.status(404).json({
+                message: "Médico não encontrado"
+            });
+        }
+    }
 }
 
 export default new DoctorController();
