@@ -285,3 +285,67 @@ it("deve retornar erro 500", async () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
 });
+
+describe("getPatientsByClinic", () => {
+    let req;
+    let res;
+
+    beforeEach(() => {
+        req = {
+            params: {}
+        };
+
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        jest.clearAllMocks();
+    });
+
+    it("deve retornar 400 se clinic_id não for informado", async () => {
+        req.params = {};
+
+        await PatientController.getPatientsByClinic(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+            message: "clinic_id é obrigatório"
+        });
+    });
+
+    it("deve retornar 200 com os pacientes da clínica", async () => {
+        req.params = { clinic_id: 1 };
+
+        const patientsMock = [
+            { id: 1, nome: "Lucas" }
+        ];
+
+        PatientService.getPatientsByClinicId.mockResolvedValue(patientsMock);
+
+        await PatientController.getPatientsByClinic(req, res);
+
+        expect(PatientService.getPatientsByClinicId)
+            .toHaveBeenCalledWith(1);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(patientsMock);
+    });
+
+    it("deve retornar 500 em caso de erro interno", async () => {
+        req.params = { clinic_id: 1 };
+
+        PatientService.getPatientsByClinicId.mockRejectedValue(
+            new Error("erro interno")
+        );
+
+        await PatientController.getPatientsByClinic(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+
+        expect(res.json).toHaveBeenCalledWith({
+            message: "Erro ao buscar pacientes",
+            error: "erro interno"
+        });
+    });
+});
