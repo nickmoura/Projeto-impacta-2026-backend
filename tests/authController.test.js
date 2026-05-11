@@ -157,6 +157,7 @@ describe("AuthController - login", () => {
     expect(res.json).toHaveBeenCalledWith({
       message: "Login realizado com sucesso",
       token: "tokenFake",
+      user: expect.any(Object)
     });
   });
 

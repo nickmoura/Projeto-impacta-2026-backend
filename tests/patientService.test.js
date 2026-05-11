@@ -98,22 +98,6 @@ it('deve fazer rollback se falhar ao criar paciente', async () => {
     );
 });
 
-it("deve retornar pacientes", async () => {
-    pool.query.mockResolvedValue([[{ id: 1 }]]);
-
-    const result = await PatientService.getPatientsByClinicId(1);
-
-    expect(result).toEqual(expect.any(Array));
-});
-
-it("deve lançar erro", async () => {
-    pool.query.mockRejectedValue(new Error("erro"));
-
-    await expect(
-        PatientService.getPatientsByClinicId(1)
-    ).rejects.toThrow("erro");
-});
-
 it("deve atualizar paciente", async () => {
     Patient.putPatientbyId.mockResolvedValue();
     pool.query.mockResolvedValue([[{ user_id: 1 }]]);
@@ -398,3 +382,26 @@ it('deve permitir atualizar quando o email é novo (cobrir else da linha 143)', 
         message: "Paciente atualizado parcialmente com sucesso"
     });
 });
+
+ it("deve retornar pacientes", async () => {
+
+        Patient.getPatientsByClinic.mockResolvedValue([
+            { id: 1, nome: "Lucas" }
+        ]);
+
+        const result = await PatientService.getPatientsByClinicId(1);
+
+        expect(result).toEqual(expect.any(Array));
+        expect(result[0].nome).toBe("Lucas");
+    });
+
+    it("deve lançar erro", async () => {
+
+        Patient.getPatientsByClinic.mockRejectedValue(
+            new Error("erro")
+        );
+
+        await expect(
+            PatientService.getPatientsByClinicId(1)
+        ).rejects.toThrow("erro");
+    });
