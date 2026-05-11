@@ -7,16 +7,16 @@ import pool from '../config/db.js';
 
 class DoctorService {
     async createDoctor(data) {
-        const { doctor: name, email, telefone, password, cnpj,  specialty, crm } = data;
+        const { doctor: name, email, telefone, password, clinic_cnpj,  specialty, crm } = data;
 
-        if (!name || !email || !telefone || !password || !cnpj || !specialty || !crm) {
+        if (!name || !email || !telefone || !password || !clinic_cnpj || !specialty || !crm) {
             throw new Error("Todos os campos sao obrigatórios");
         }
 
         let user;
 
         try {
-            const clinic = await Clinic.getClinicByCNPJ(cnpj);
+            const clinic = await Clinic.getClinicByCNPJ(clinic_cnpj);
 
             if (!clinic) {
                 throw new Error("Clínica não encontrada com o CNPJ fornecido");
@@ -66,6 +66,34 @@ class DoctorService {
         }
 
         return doctor;
+    }
+
+    async putDoctor_by_id(doctor_id, data) {
+        const doctorExists = await Doctor.getDoctorById(doctor_id);
+
+        if (!doctorExists) {
+            throw new Error("Médico não encontrado");
+        }
+
+        await Doctor.putDoctorById(doctor_id, data);
+
+        const userData = {
+            nome: data.doctor,
+            email: data.email
+        };
+
+        if (data.password) {
+            userData.password = await bcrypt.hash(data.password, 10);
+        }
+
+        await User.putUserById(
+            doctorExists.user_id,
+            userData
+        )
+
+        const updatedDoctor = await Doctor.getDoctorById(doctor_id);
+
+        return updatedDoctor;
     }
 }
 export default new DoctorService();

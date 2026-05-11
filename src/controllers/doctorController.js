@@ -38,6 +38,23 @@ class DoctorController {
             });
         }
     }
+
+    async putDoctor(req, res) {
+        try {
+            const { doctor_id } = req.params;
+            const data = req.body;
+
+            const doctor = await doctorService.putDoctor_by_id(doctor_id, data);
+
+            return res.status(200).json(doctor);
+
+        } catch (error) {
+
+            return res.status(404).json({
+                message: "Médico não encontrado"
+            });
+        }
+    }
 }
 
 export default new DoctorController();

@@ -47,6 +47,24 @@ const Doctor =  {
             [doctor_id]
         );
         return rows.length ? rows[0] : null;
+    },
+
+    putDoctorById: async (doctor_id, data) => {
+        const { crm, specialty } = data;
+
+        const query = `
+            UPDATE Doctor 
+            SET crm = ?, specialty = ? 
+            WHERE id = ?
+        `;
+
+        const [result] = await pool.query(query, [
+            crm, 
+            specialty, 
+            doctor_id
+        ]);
+
+        return result
     }
 };
 
