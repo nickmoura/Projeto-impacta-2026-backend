@@ -24,6 +24,20 @@ class DoctorController {
             });
         }
     }
+
+    async getDoctor(req, res) {
+        try {
+            const {doctor_id} = req.params;
+
+            const doctor = await doctorService.getDoctor_by_id(doctor_id);
+
+            return res.status(200).json(doctor);
+        } catch (error) {
+            return res.status(404).json({
+                message: "Médico não encontrado"
+            });
+        }
+    }
 }
 
 export default new DoctorController();

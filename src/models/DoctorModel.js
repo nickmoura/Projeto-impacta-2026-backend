@@ -29,6 +29,24 @@ const Doctor =  {
         );
 
         return rows;
+    },
+
+    getDoctorById: async (doctor_id) => {
+        const [rows] = await pool.query(
+             `SELECT
+                d.id AS doctor_id,
+                d.user_id,
+                d.clinic_id,
+                d.crm,
+                d.specialty,
+                u.nome,
+                u.email
+            FROM Doctor d
+            JOIN User u ON d.user_id = u.id
+            WHERE d.id = ?`,
+            [doctor_id]
+        );
+        return rows.length ? rows[0] : null;
     }
 };
 
