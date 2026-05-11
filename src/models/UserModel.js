@@ -52,16 +52,34 @@ const User = {
     },
 
     putUserById: async (user_id, data) => {
-        const { nome, email, password} = data;
 
-        const query = `UPDATE User SET nome = ?, email = ?, password = ? WHERE id = ?`;
+        const fields = [];
+        const values = [];
 
-        const [result] =await pool.query(query, [
-            nome,
-            email,
-            password,
-            user_id
-        ]);
+        if (data.nome) {
+            fields.push("nome = ?");
+            values.push(data.nome);
+        }
+
+        if (data.email) {
+            fields.push("email = ?");
+            values.push(data.email);
+        }
+
+        if (data.password) {
+            fields.push("password = ?");
+            values.push(data.password);
+        }
+
+        values.push(user_id);
+
+        const query = `
+            UPDATE User
+            SET ${fields.join(", ")}
+            WHERE id = ?
+        `;
+
+        const [result] = await pool.query(query, values);
 
         return result;
     },
