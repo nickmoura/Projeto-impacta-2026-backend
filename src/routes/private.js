@@ -4,6 +4,7 @@ import dashboradController from '../controllers/dashboardController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import appointmentController from '../controllers/appointmentController.js';
 import patientController from '../controllers/patientController.js';
+import doctorController from '../controllers/doctorController.js';
 
 const router = express.Router();
 
@@ -24,5 +25,7 @@ router.patch('/patients/:patient_id', authMiddleware, patientController.patchPat
 router.get('/patients/clinic/:clinic_id', authMiddleware, patientController.getPatientsByClinic);
 
 router.delete('/patients/:id', authMiddleware, patientController.deletePatient);
+
+router.post('/doctors', authMiddleware, doctorController.createDoctor);
 
 export default router;
