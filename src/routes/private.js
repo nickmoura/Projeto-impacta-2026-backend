@@ -27,6 +27,7 @@ router.get('/patients/clinic/:clinic_id', authMiddleware, patientController.getP
 router.delete('/patients/:id', authMiddleware, patientController.deletePatient);
 
 router.post('/doctors', authMiddleware, doctorController.createDoctor);
+router.get('/doctors/clinic/:clinic_id', authMiddleware, doctorController.getDoctorsByClinic); // mais específica primeiro
 router.get('/doctors/:doctor_id', authMiddleware, doctorController.getDoctor);
 router.put('/doctors/:doctor_id', authMiddleware, doctorController.putDoctor);
 router.delete('/doctors/:doctor_id', authMiddleware, doctorController.deleteDoctor);
