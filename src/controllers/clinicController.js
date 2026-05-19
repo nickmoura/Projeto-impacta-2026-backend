@@ -49,7 +49,7 @@ class ClinicController {
 
       return res.status(200).json(clinic);
     } catch (error) {
-      return res.status(500).json({
+      return res.status(404).json({
         error: error.message,
       });
     }
@@ -61,7 +61,7 @@ class ClinicController {
 
       if (!cnpj) {
         return res.status(400).json({
-          error: 'CNPJ é onbrigatório',
+          error: 'CNPJ é obrigatório',
         });
       }
 
@@ -71,7 +71,7 @@ class ClinicController {
         clinicId: clinicId,
       });
     } catch (error) {
-      return res.status(500).json({
+      return res.status(404).json({
         error: error.message,
       });
     }
@@ -87,7 +87,7 @@ class ClinicController {
         message: 'Clínica atualizada com sucesso',
       });
     } catch (error) {
-      return res.status(500).json({
+      return res.status(404).json({
         error: error.message,
       });
     }
@@ -103,7 +103,7 @@ class ClinicController {
         message: 'Clínica removida com sucesso',
       });
     } catch (error) {
-      return res.status(400).json({
+      return res.status(404).json({
         error: error.message,
       });
     }
