@@ -17,11 +17,10 @@ model Clinic {
   id        Int    @id @default(autoincrement())
   nome      String
   cnpj      String @unique
-  email     String @unique
-  password  String
 
   users       User[]
   doctors     Doctor[]
+  patients     Patient[]
   appointments Appointment[]
 }
 
@@ -30,19 +29,28 @@ model User {
   nome      String
   email     String   @unique
   password  String
-  role      String
-  clinic_id Int
 
-  clinic   Clinic? @relation(fields: [clinic_id], references: [id])
+
+  role      Role
+
+  clinic_id Int
+  clinic   Clinic @relation(fields: [clinic_id], references: [id])
+
   doctor   Doctor?
-  patient  Patient?
   appointments Appointment[] @relation("CreatedAppointments")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  RECEPTIONIST
 }
 
 model Doctor {
   id        Int    @id @default(autoincrement())
   user_id   Int    @unique
   clinic_id Int
+
   crm       String
   specialty String
 
@@ -57,8 +65,8 @@ model Patient {
   email     String @unique
   telefone  String
   
-  user_id   Int     @unique
-  user      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  clinic_id   Int
+  clinic      Clinic    @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
 
   appointments Appointment[]
 }
