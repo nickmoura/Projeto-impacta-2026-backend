@@ -1,0 +1,66 @@
+import bcrypt from 'bcryptjs';
+import ClinicModel from '../models/clinicModel';
+
+class ClinicService {
+  static async createClinic(data) {
+    const clinicExists = await ClinicModel.getByCNPJ(data.cnpj);
+
+    if (clinicExists) {
+      throw new Error('Clínica já cadastrada');
+    }
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    const clinicId = await ClinicModel.create({
+      ...data,
+      password: hashedPassword,
+    });
+
+    return clinicId;
+  }
+
+  static async getAllClinics() {
+    return await ClinicModel.getAll();
+  }
+
+  static async getClinicById(id) {
+    const clinic = await ClinicModel.getById(id);
+
+    if (!clinic) {
+      throw new Error('Clínica não encontrada');
+    }
+
+    return clinic;
+  }
+
+  static async getClinicIdByCNPJ(cnpj) {
+    const clinic = await ClinicModel.getByCNPJ(cnpj);
+
+    if (!clinic) {
+      throw new Error('Clínica não encontrada');
+    }
+
+    return clinic.id;
+  }
+
+  static async updateClinic(id, data) {
+    const clinic = await ClinicModel.getById(id);
+
+    if (!clinic) {
+      throw new Error('Clínica não encontrada');
+    }
+
+    await ClinicModel.update(id, data);
+  }
+
+  static async deleteClinic(id) {
+    const clinic = await ClinicModel.getById(id);
+
+    if (!clinic) {
+      throw new Error('Clinica nao encontrada');
+    }
+
+    await ClinicModel.delete(id);
+  }
+}
+export default ClinicService;
