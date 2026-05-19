@@ -63,6 +63,11 @@ router.delete(
 
 router.post('/clinics', authMiddleware, clinicController.createClinic);
 router.get('/clinics', authMiddleware, clinicController.getAllClinics);
+router.get(
+  '/clinics/cnpj/:cnpj',
+  authMiddleware,
+  clinicController.getClinicIdByCNPJ,
+);
 router.get('/clinics/:id', authMiddleware, clinicController.getClinicById);
 router.put('/clinics/:id', authMiddleware, clinicController.updateClinic);
 router.delete('/clinics/:id', authMiddleware, clinicController.deleteClinic);

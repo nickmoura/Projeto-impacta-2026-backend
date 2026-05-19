@@ -1,5 +1,5 @@
-import bcrypt from 'bcryptjs';
-import ClinicModel from '../models/clinicModel';
+import bcrypt from 'bcrypt';
+import ClinicModel from '../models/clinicModel.js';
 
 class ClinicService {
   static async createClinic(data) {

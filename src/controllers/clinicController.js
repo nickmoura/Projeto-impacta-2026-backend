@@ -31,9 +31,7 @@ class ClinicController {
 
   static async getAllClinics(req, res) {
     try {
-      const { id } = req.params;
-
-      const clinic = await ClinicService.getClinicById(id);
+      const clinic = await ClinicService.getAllClinics();
 
       return res.status(200).json(clinic);
     } catch (error) {
