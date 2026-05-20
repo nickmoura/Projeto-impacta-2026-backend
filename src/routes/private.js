@@ -53,11 +53,6 @@ router.get(
 router.delete('/patients/:id', authMiddleware, patientController.deletePatient);
 
 router.post('/doctors', authMiddleware, doctorController.createDoctor);
-router.get(
-  '/doctors/clinic/:clinic_id',
-  authMiddleware,
-  doctorController.getDoctorsByClinic,
-); // mais específica primeiro ---- mover isso para rota da clinica
 router.get('/doctors/:doctor_id', authMiddleware, doctorController.getDoctor);
 router.put('/doctors/:doctor_id', authMiddleware, doctorController.putDoctor);
 router.delete(
@@ -74,6 +69,11 @@ router.get(
   clinicController.getClinicIdByCNPJ,
 );
 router.get('/clinics/:id', authMiddleware, clinicController.getClinicById);
+router.get(
+  '/clinics/:clinic_id/doctors',
+  authMiddleware,
+  clinicController.getDoctorsByClinic,
+);
 router.put('/clinics/:id', authMiddleware, clinicController.updateClinic);
 router.delete('/clinics/:id', authMiddleware, clinicController.deleteClinic);
 

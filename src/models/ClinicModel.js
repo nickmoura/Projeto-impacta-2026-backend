@@ -36,6 +36,26 @@ class ClinicModel {
     return rows[0];
   }
 
+  static async getDoctorsByClinicId(clinic_id) {
+    const [rows] = await pool.query(
+      `
+            SELECT
+                d.id AS doctor_id,
+                d.crm,
+                d.specialty,
+                d.clinic_id,
+                u.id AS user_id,
+                u.nome,
+                u.email
+            FROM Doctor d
+            JOIN User u ON d.user_id = u.id
+            WHERE d.clinic_id = ?
+            `,
+      [clinic_id],
+    );
+    return rows;
+  }
+
   static async update(id, { nome, cnpj, email, password }) {
     const query = `
             UPDATE Clinic

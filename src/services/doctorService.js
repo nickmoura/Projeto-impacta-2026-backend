@@ -1,91 +1,66 @@
+import bcrypt from 'bcrypt';
 import Doctor from '../models/DoctorModel.js';
 import Clinic from '../models/ClinicModel.js';
 import User from '../models/UserModel.js';
-import bcrypt from 'bcrypt';
-import pool from '../config/db.js';
 
 class DoctorService {
   async createDoctor(data) {
-    //remover essa duplicacao de codigo e redundancia
-    const {
-      doctor: name,
-      email,
-      telefone,
-      password,
-      clinic_cnpj,
-      clinic_id: providedClinicId,
-      specialty,
-      crm,
-    } = data;
+    const { name, email, telefone, password, clinic_cnpj, specialty, crm } =
+      data;
 
-    if (!name || !email || !telefone || !password || !specialty || !crm) {
+    if (
+      !name ||
+      !email ||
+      !telefone ||
+      !password ||
+      !clinic_cnpj ||
+      !specialty ||
+      !crm
+    ) {
       throw new Error('Todos os campos sao obrigatórios');
     }
 
-    if (!clinic_cnpj && !providedClinicId) {
-      throw new Error('clinic_cnpj ou clinic_id é obrigatório');
+    const clinic = await Clinic.getClinicByCNPJ(clinic_cnpj);
+
+    if (!clinic) {
+      throw new Error('Clínica não encontrada');
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     let user;
 
     try {
-      let clinic_id;
-
-      if (providedClinicId) {
-        clinic_id = providedClinicId;
-      } else {
-        const clinic = await Clinic.getClinicByCNPJ(clinic_cnpj);
-
-        if (!clinic) {
-          throw new Error('Clínica não encontrada com o CNPJ fornecido');
-        }
-
-        clinic_id = clinic.id;
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
       user = await User.createNewUser(
         name,
         email,
         hashedPassword,
-        'doctor',
-        clinic_id,
+        'DOCTOR',
+        clinic.id,
       );
 
       const newDoctor = await Doctor.createDoctor(
         user.id,
-        clinic_id,
+        clinic.id,
         crm,
         specialty,
-        name,
-        email,
-        telefone,
       );
 
-      return newDoctor;
+      return await Doctor.getDoctorById(newDoctor.id);
     } catch (error) {
       if (user) {
-        await pool.query('DELETE FROM User WHERE id = ?', [user.id]);
+        await User.deleteUserById(user.id);
       }
 
-      if (error.code === 'ER_DUP_ENTRY' || error.errno === 1062) {
-        if (error.message && error.message.includes('email')) {
-          const err = new Error('EMAIL_ALREADY_EXISTS');
-          err.code = 'EMAIL_ALREADY_EXISTS';
-          throw err;
-        }
+      if (error.code === 'ER_DUP_ENTRY') {
+        const err = new Error('EMAIL_ALREADY_EXISTS');
+        err.code = 'EMAIL_ALREADY_EXISTS';
+
+        throw err;
       }
 
       throw error;
     }
-  }
-
-  async getDoctorsByClinic(clinic_id) {
-    // mover isso para api de clinica
-    // Reutiliza o método getDoctorByClinic que já existe no DoctorModel
-    const doctors = await Doctor.getDoctorByClinic(clinic_id);
-    return doctors;
   }
 
   async getDoctor_by_id(doctor_id) {
@@ -105,29 +80,23 @@ class DoctorService {
       throw new Error('Médico não encontrado');
     }
 
-    const doctorData = {
+    await Doctor.putDoctorById(doctor_id, {
       crm: data.crm,
       specialty: data.specialty,
-      nome: data.doctor,
-      email: data.email,
-    };
+    });
 
-    await Doctor.putDoctorById(doctor_id, doctorData);
-
-    const userData = {
-      nome: data.doctor,
+    const useData = {
+      name: data.name,
       email: data.email,
     };
 
     if (data.password) {
-      userData.password = await bcrypt.hash(data.password, 10);
+      useData.password = await bcrypt.hash(data.password, 10);
     }
 
-    await User.putUserById(doctorExists.user_id, userData);
+    await User.putUserById(doctorExists.user_id, useData);
 
-    const updatedDoctor = await Doctor.getDoctorById(doctor_id);
-
-    return updatedDoctor;
+    return await Doctor.getDoctorById(doctor_id);
   }
 
   async deleteDoctor_by_id(doctor_id) {
@@ -142,4 +111,5 @@ class DoctorService {
     await User.deleteUserById(doctorExists.user_id);
   }
 }
+
 export default new DoctorService();

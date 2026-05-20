@@ -43,6 +43,10 @@ class ClinicService {
     return clinic.id;
   }
 
+  static async getDoctorsByClinic(clinic_id) {
+    return await ClinicModel.getDoctorsByClinicId(clinic_id);
+  }
+
   static async updateClinic(id, data) {
     const clinic = await ClinicModel.getById(id);
 

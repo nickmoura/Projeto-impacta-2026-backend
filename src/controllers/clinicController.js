@@ -77,6 +77,19 @@ class ClinicController {
     }
   }
 
+  static async getDoctorsByClinic(req, res) {
+    try {
+      const { clinic_id } = req.params;
+      const doctors = await ClinicService.getDoctorsByClinic(clinic_id);
+      return res.status(200).json(doctors);
+    } catch (error) {
+      console.error('Erro em getDoctorsByClinic:', error);
+      return res
+        .status(500)
+        .json({ message: 'Erro ao buscar médicos da clínica' });
+    }
+  }
+
   static async updateClinic(req, res) {
     try {
       const { id } = req.params;
