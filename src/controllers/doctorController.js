@@ -37,13 +37,16 @@ class DoctorController {
   }
 
   async getDoctorsByClinic(req, res) {
+    //  mover isso para api de clinica
     try {
       const { clinic_id } = req.params;
       const doctors = await doctorService.getDoctorsByClinic(clinic_id);
       return res.status(200).json(doctors);
     } catch (error) {
       console.error('Erro em getDoctorsByClinic:', error);
-      return res.status(500).json({ message: 'Erro ao buscar médicos da clínica' });
+      return res
+        .status(500)
+        .json({ message: 'Erro ao buscar médicos da clínica' });
     }
   }
 
