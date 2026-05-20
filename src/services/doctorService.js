@@ -7,22 +7,32 @@ import pool from '../config/db.js';
 
 class DoctorService {
     async createDoctor(data) {
-        const { doctor: name, email, telefone, password, clinic_cnpj,  specialty, crm } = data;
+        const { doctor: name, email, telefone, password, clinic_cnpj, clinic_id: providedClinicId, specialty, crm } = data;
 
-        if (!name || !email || !telefone || !password || !clinic_cnpj || !specialty || !crm) {
+        if (!name || !email || !telefone || !password || !specialty || !crm) {
             throw new Error("Todos os campos sao obrigatórios");
+        }
+
+        if (!clinic_cnpj && !providedClinicId) {
+            throw new Error("clinic_cnpj ou clinic_id é obrigatório");
         }
 
         let user;
 
         try {
-            const clinic = await Clinic.getClinicByCNPJ(clinic_cnpj);
+            let clinic_id;
 
-            if (!clinic) {
-                throw new Error("Clínica não encontrada com o CNPJ fornecido");
+            if (providedClinicId) {
+                clinic_id = providedClinicId;
+            } else {
+                const clinic = await Clinic.getClinicByCNPJ(clinic_cnpj);
+
+                if (!clinic) {
+                    throw new Error("Clínica não encontrada com o CNPJ fornecido");
+                }
+
+                clinic_id = clinic.id;
             }
-            
-            const clinic_id = clinic.id;
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -35,27 +45,38 @@ class DoctorService {
             );
 
             const newDoctor = await Doctor.createDoctor(
-              user.id,
-              clinic_id,
-              crm,
-              specialty
+                user.id,
+                clinic_id,
+                crm,
+                specialty,
+                name,
+                email,
+                telefone
             );
 
             return newDoctor;
 
         } catch (error) {
-           if (user) {
+            if (user) {
                 await pool.query("DELETE FROM User WHERE id = ?", [user.id]);
             }
 
             if (error.code === "ER_DUP_ENTRY" || error.errno === 1062) {
-                const err = new Error("EMAIL_ALREADY_EXISTS");
-                err.code = "EMAIL_ALREADY_EXISTS";
-                throw err;
+                if (error.message && error.message.includes("email")) {
+                    const err = new Error("EMAIL_ALREADY_EXISTS");
+                    err.code = "EMAIL_ALREADY_EXISTS";
+                    throw err;
+                }
             }
 
             throw error;
         }
+    }
+
+    async getDoctorsByClinic(clinic_id) {
+        // Reutiliza o método getDoctorByClinic que já existe no DoctorModel
+        const doctors = await Doctor.getDoctorByClinic(clinic_id);
+        return doctors;
     }
 
     async getDoctor_by_id(doctor_id) {
@@ -75,7 +96,14 @@ class DoctorService {
             throw new Error("Médico não encontrado");
         }
 
-        await Doctor.putDoctorById(doctor_id, data);
+        const doctorData = {
+            crm: data.crm,
+            specialty: data.specialty,
+            nome: data.doctor,
+            email: data.email
+        };
+
+        await Doctor.putDoctorById(doctor_id, doctorData);
 
         const userData = {
             nome: data.doctor,
