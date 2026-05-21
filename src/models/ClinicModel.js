@@ -13,7 +13,7 @@ class ClinicModel {
   }
 
   static async getAll() {
-    const query = `SELECT id, nome, cnpj, FROM Clinic`;
+    const query = `SELECT id, nome, cnpj FROM Clinic`;
 
     const [rows] = await pool.query(query);
 
@@ -25,18 +25,16 @@ class ClinicModel {
 
     const [rows] = await pool.query(query, [id]);
 
-    return rows[0];
+    return rows[0] || null;
   }
 
   static async getByCNPJ(cnpj) {
-    const query = `SELECT id, nome, cnpj FROM Clinic WHERE cnpj = ?`;
+    const [rows] = await pool.query(
+      `SELECT id, nome, cnpj FROM Clinic WHERE cnpj = ?`,
+      [cnpj],
+    );
 
-    const [rows] = await pool.query(query, [cnpj]);
-    if (rows.length === 0) {
-      throw new Error('Clínica não encontrada com cnpj fornecido');
-    }
-
-    return rows[0];
+    return rows[0] || null;
   }
 
   static async getDoctorsByClinicId(clinic_id) {
