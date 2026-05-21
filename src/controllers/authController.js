@@ -13,7 +13,7 @@ const registro = async (req, res) => {
       });
     }
 
-    const clinic = await Clinic.getClinicByCNPJ(cnpj);
+    const clinic = await Clinic.getByCNPJ(cnpj);
     const clinic_id = clinic.id;
 
     const hashpassword = await bcrypt.hash(password, 10);
@@ -63,6 +63,9 @@ async function login(req, res) {
       token,
       user: {
         id: user.id,
+        nome: user.nome,
+        email: user.email,
+        role: user.role,
         clinic_id: user.clinic_id,
       },
     });

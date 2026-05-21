@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import ClinicModel from '../models/clinicModel.js';
 
 class ClinicService {
@@ -9,11 +8,9 @@ class ClinicService {
       throw new Error('Clínica já cadastrada');
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-
     const clinicId = await ClinicModel.create({
-      ...data,
-      password: hashedPassword,
+      nome: data.nome,
+      cnpj: data.cnpj,
     });
 
     return clinicId;

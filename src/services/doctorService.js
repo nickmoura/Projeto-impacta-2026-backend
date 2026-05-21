@@ -20,7 +20,7 @@ class DoctorService {
       throw new Error('Todos os campos sao obrigatórios');
     }
 
-    const clinic = await Clinic.getClinicByCNPJ(clinic_cnpj);
+    const clinic = await Clinic.getByCNPJ(clinic_cnpj);
 
     if (!clinic) {
       throw new Error('Clínica não encontrada');

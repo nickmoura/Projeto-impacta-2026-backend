@@ -1,19 +1,19 @@
 import pool from '../config/db.js';
 
 class ClinicModel {
-  static async create({ nome, cnpj, email, password }) {
+  static async create({ nome, cnpj }) {
     const query = `
-            INSERT INTO Clinic (nome, cnpj, email, password)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO Clinic (nome, cnpj)
+            VALUES (?, ?)
         `;
 
-    const [result] = await pool.query(query, [nome, cnpj, email, password]);
+    const [result] = await pool.query(query, [nome, cnpj]);
 
     return result.insertId;
   }
 
   static async getAll() {
-    const query = `SELECT id, nome, cnpj, email FROM Clinic`;
+    const query = `SELECT id, nome, cnpj, FROM Clinic`;
 
     const [rows] = await pool.query(query);
 
@@ -21,7 +21,7 @@ class ClinicModel {
   }
 
   static async getById(id) {
-    const query = `SELECT id, nome, cnpj, email FROM Clinic WHERE id = ?`;
+    const query = `SELECT id, nome, cnpj FROM Clinic WHERE id = ?`;
 
     const [rows] = await pool.query(query, [id]);
 
@@ -29,9 +29,12 @@ class ClinicModel {
   }
 
   static async getByCNPJ(cnpj) {
-    const query = `SELECT id, nome, cnpj, email FROM Clinic WHERE cnpj = ?`;
+    const query = `SELECT id, nome, cnpj FROM Clinic WHERE cnpj = ?`;
 
     const [rows] = await pool.query(query, [cnpj]);
+    if (rows.length === 0) {
+      throw new Error('Clínica não encontrada com cnpj fornecido');
+    }
 
     return rows[0];
   }
@@ -46,7 +49,8 @@ class ClinicModel {
                 d.clinic_id,
                 u.id AS user_id,
                 u.nome,
-                u.email
+                u.email,
+                u.telefone
             FROM Doctor d
             JOIN User u ON d.user_id = u.id
             WHERE d.clinic_id = ?
@@ -56,14 +60,14 @@ class ClinicModel {
     return rows;
   }
 
-  static async update(id, { nome, cnpj, email, password }) {
+  static async update(id, { nome, cnpj }) {
     const query = `
             UPDATE Clinic
-            SET nome = ?, cnpj = ?, email = ?, password = ?
+            SET nome = ?, cnpj = ?
             WHERE id = ?
         `;
 
-    await pool.query(query, [nome, cnpj, email, password, id]);
+    await pool.query(query, [nome, cnpj, id]);
   }
 
   static async delete(id) {
