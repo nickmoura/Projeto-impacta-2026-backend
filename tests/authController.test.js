@@ -1,18 +1,17 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import { registro, login} from "../src/controllers/authController.js";
-import User from "../src/models/UserModel.js";
-import Clinic from "../src/models/ClinicModel.js";
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import { registro, login } from '../src/controllers/authController.js';
+import User from '../src/models/UserModel.js';
+import Clinic from '../src/models/ClinicModel.js';
 
-
-jest.mock("../src/models/ClinicModel.js", () => ({
+jest.mock('../src/models/ClinicModel.js', () => ({
   __esModule: true,
   default: {
-    getClinicByCNPJ: jest.fn(),
+    getByCNPJ: jest.fn(),
   },
 }));
 
-jest.mock("../src/models/UserModel.js", () => ({
+jest.mock('../src/models/UserModel.js', () => ({
   __esModule: true,
   default: {
     createNewUser: jest.fn(),
@@ -20,25 +19,25 @@ jest.mock("../src/models/UserModel.js", () => ({
   },
 }));
 
-jest.mock("bcrypt", () => ({
-    hash: jest.fn(),
-  }));
-
-jest.mock("jsonwebtoken", () => ({
-    sign: jest.fn(),
+jest.mock('bcrypt', () => ({
+  hash: jest.fn(),
 }));
 
-describe("AuthController - registro", () => {
+jest.mock('jsonwebtoken', () => ({
+  sign: jest.fn(),
+}));
+
+describe('AuthController - registro', () => {
   let req;
   let res;
 
   beforeEach(() => {
     req = {
       body: {
-        nome: "Lucas",
-        email: "lucas@email.com",
-        password: "123456",
-        cnpj: "12345678901234",
+        nome: 'Lucas',
+        email: 'lucas@email.com',
+        password: '123456',
+        cnpj: '12345678901234',
       },
     };
 
@@ -50,77 +49,77 @@ describe("AuthController - registro", () => {
     jest.clearAllMocks();
   });
 
-  it("deve retornar 400 se faltar campos obrigatórios", async () => {
+  it('deve retornar 400 se faltar campos obrigatórios', async () => {
     req.body = {};
 
     await registro(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      error: "nome, e-mail, senha e cnpj são obrigatórios",
+      error: 'nome, e-mail, senha e cnpj são obrigatórios',
     });
   });
 
-  it("deve registrar usuário com sucesso", async () => {
-    bcrypt.hash.mockResolvedValue("hashFake");
+  it('deve registrar usuário com sucesso', async () => {
+    bcrypt.hash.mockResolvedValue('hashFake');
 
-    Clinic.getClinicByCNPJ.mockResolvedValue({ id: 1 });
+    Clinic.getByCNPJ.mockResolvedValue({ id: 1 });
 
     User.createNewUser.mockResolvedValue({
       id: 1,
-      nome: "Lucas",
-      email: "lucas@email.com",
+      nome: 'Lucas',
+      email: 'lucas@email.com',
     });
 
     await registro(req, res);
 
-    expect(bcrypt.hash).toHaveBeenCalledWith("123456", 10);
+    expect(bcrypt.hash).toHaveBeenCalledWith('123456', 10);
 
     expect(User.createNewUser).toHaveBeenCalledWith(
-      "Lucas",
-      "lucas@email.com",
-      "hashFake",
-      "user",
-      1
+      'Lucas',
+      'lucas@email.com',
+      'hashFake',
+      'RECEPTIONIST',
+      1,
     );
 
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
-      message: "Usuário registrado com sucesso!",
+      message: 'Usuário registrado com sucesso!',
       user: expect.any(Object),
     });
   });
 
-  it("deve retornar 500 se ocorrer erro", async () => {
+  it('deve retornar 500 se ocorrer erro', async () => {
     req.body = {
-      nome: "Lucas",
-      email: "lucas@email.com",
-      password: "123456",
-      cnpj: "12345678901234",
+      nome: 'Lucas',
+      email: 'lucas@email.com',
+      password: '123456',
+      cnpj: '12345678901234',
     };
 
-    bcrypt.hash.mockRejectedValue(new Error("Erro interno"));
+    bcrypt.hash.mockRejectedValue(new Error('Erro interno'));
 
     await registro(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
-      error: "Erro ao registrar o usuário",
+      error: 'Erro ao registrar o usuário',
     });
   });
 });
 
-describe("AuthController - login", () => {
+describe('AuthController - login', () => {
   let req;
   let res;
 
   beforeEach(() => {
-    process.env.JWT_SECRET = "segredo";
+    process.env.JWT_SECRET = 'segredo';
 
     req = {
       body: {
-        email: "lucas@email.com",
-        password: "123456",
+        email: 'lucas@email.com',
+        password: '123456',
       },
     };
 
@@ -132,45 +131,43 @@ describe("AuthController - login", () => {
     jest.clearAllMocks();
   });
 
-  it("deve fazer login com sucesso", async () => {
+  it('deve fazer login com sucesso', async () => {
     User.login.mockResolvedValue({
       id: 1,
-      email: "lucas@email.com",
+      nome: 'Lucas',
+      email: 'lucas@email.com',
+      role: 'RECEPTIONIST',
+      clinic_id: 1,
     });
 
-    jwt.sign.mockReturnValue("tokenFake");
+    jwt.sign.mockReturnValue('tokenFake');
 
     await login(req, res);
 
-    expect(User.login).toHaveBeenCalledWith(
-      "lucas@email.com",
-      "123456"
-    );
+    expect(User.login).toHaveBeenCalledWith('lucas@email.com', '123456');
 
     expect(jwt.sign).toHaveBeenCalledWith(
-      { id: 1, email: "lucas@email.com" },
-      "segredo",
-      { expiresIn: "1h" }
+      { id: 1, email: 'lucas@email.com', clinic_id: 1, role: 'RECEPTIONIST' },
+      'segredo',
+      { expiresIn: '1h' },
     );
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
-      message: "Login realizado com sucesso",
-      token: "tokenFake",
-      user: expect.any(Object)
+      message: 'Login realizado com sucesso',
+      token: 'tokenFake',
+      user: expect.any(Object),
     });
   });
 
-  it("deve retornar 400 se login falhar", async () => {
-    User.login.mockRejectedValue(
-      new Error("Credenciais inválidas")
-    );
+  it('deve retornar 400 se login falhar', async () => {
+    User.login.mockRejectedValue(new Error('Credenciais inválidas'));
 
     await login(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      error: "Credenciais inválidas",
+      error: 'Credenciais inválidas',
     });
   });
 });
