@@ -108,6 +108,7 @@ describe('DoctorController', () => {
 
       expect(res.json).toHaveBeenCalledWith({
         message: 'Médico não encontrado',
+        error: 'Não encontrado',
       });
     });
   });
@@ -136,7 +137,9 @@ describe('DoctorController', () => {
     });
 
     it('deve retornar 404 ao atualizar médico inexistente', async () => {
-      doctorService.putDoctor_by_id.mockRejectedValue(new Error());
+      doctorService.putDoctor_by_id.mockRejectedValue(
+        new Error('Não encontrado'),
+      );
 
       await doctorController.putDoctor(req, res);
 
@@ -144,6 +147,7 @@ describe('DoctorController', () => {
 
       expect(res.json).toHaveBeenCalledWith({
         message: 'Médico não encontrado',
+        error: 'Não encontrado',
       });
     });
   });
@@ -164,7 +168,9 @@ describe('DoctorController', () => {
     });
 
     it('deve retornar 404 ao deletar médico inexistente', async () => {
-      doctorService.deleteDoctor_by_id.mockRejectedValue(new Error());
+      doctorService.deleteDoctor_by_id.mockRejectedValue(
+        new Error('Não encontrado'),
+      );
 
       await doctorController.deleteDoctor(req, res);
 
@@ -172,6 +178,7 @@ describe('DoctorController', () => {
 
       expect(res.json).toHaveBeenCalledWith({
         message: 'Médico não encontrado',
+        error: 'Não encontrado',
       });
     });
   });
