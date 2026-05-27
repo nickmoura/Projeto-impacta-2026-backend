@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,53 +8,52 @@ datasource db {
 }
 
 model Clinic {
-  id        Int    @id @default(autoincrement())
-  nome      String
-  cnpj      String @unique
-  email     String @unique
-  password  String
-
-  users       User[]
-  doctors     Doctor[]
+  id           Int           @id @default(autoincrement())
+  nome         String
+  cnpj         String        @unique
   appointments Appointment[]
+  doctors      Doctor[]
+  patients     Patient[]
+  users        User[]
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  email     String   @unique
-  password  String
-  role      String
-  clinic_id Int
-
-  clinic   Clinic? @relation(fields: [clinic_id], references: [id])
-  doctor   Doctor?
-  patient  Patient?
+  id           Int           @id @default(autoincrement())
+  nome         String
+  email        String        @unique
+  password     String
+  role         Role
+  clinic_id    Int
   appointments Appointment[] @relation("CreatedAppointments")
+  doctor       Doctor?
+  clinic       Clinic        @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
+
+  @@index([clinic_id], map: "User_clinic_id_fkey")
 }
 
 model Doctor {
-  id        Int    @id @default(autoincrement())
-  user_id   Int    @unique
-  clinic_id Int
-  crm       String
-  specialty String
-
-  user     User   @relation(fields: [user_id], references: [id])
-  clinic   Clinic @relation(fields: [clinic_id], references: [id])
+  id           Int           @id @default(autoincrement())
+  user_id      Int           @unique
+  clinic_id    Int
+  crm          String        @unique
+  specialty    String
   appointments Appointment[]
+  clinic       Clinic        @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([clinic_id])
 }
 
 model Patient {
-  id        Int    @id @default(autoincrement())
-  nome      String
-  email     String @unique
-  telefone  String
-  
-  user_id   Int     @unique
-  user      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
+  id           Int           @id @default(autoincrement())
+  nome         String
+  email        String        @unique
+  telefone     String
+  clinic_id    Int
   appointments Appointment[]
+  clinic       Clinic        @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
+
+  @@index([clinic_id], map: "Patient_clinic_id_fkey")
 }
 
 model Appointment {
@@ -71,12 +64,20 @@ model Appointment {
   created_by       Int
   appointment_date DateTime
   status           String
-
-  clinic   Clinic @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
-  doctor   Doctor  @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
-  patient  Patient @relation(fields: [patient_id], references: [id], onDelete: Cascade)
-  createdBy User   @relation("CreatedAppointments", fields: [created_by], references: [id], onDelete:Cascade)
+  clinic           Clinic   @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
+  createdBy        User     @relation("CreatedAppointments", fields: [created_by], references: [id], onDelete: Cascade)
+  doctor           Doctor   @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+  patient          Patient  @relation(fields: [patient_id], references: [id], onDelete: Cascade)
 
   @@unique([doctor_id, appointment_date])
   @@index([patient_id])
+  @@index([doctor_id])
+  @@index([clinic_id], map: "Appointment_clinic_id_fkey")
+  @@index([created_by], map: "Appointment_created_by_fkey")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  RECEPTIONIST
 }
