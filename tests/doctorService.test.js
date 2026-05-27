@@ -3,7 +3,6 @@ import Doctor from '../src/models/DoctorModel.js';
 import Clinic from '../src/models/ClinicModel.js';
 import User from '../src/models/UserModel.js';
 import bcrypt from 'bcrypt';
-import pool from '../src/config/db.js';
 
 jest.mock('bcrypt');
 
@@ -66,6 +65,10 @@ describe('DoctorService', () => {
 
       Doctor.createDoctor.mockResolvedValue({
         id: 5,
+      });
+
+      Doctor.getDoctorById.mockResolvedValue({
+        id: 5,
         crm: '9999',
       });
 
@@ -93,7 +96,7 @@ describe('DoctorService', () => {
       Clinic.getByCNPJ.mockResolvedValue(null);
 
       await expect(DoctorService.createDoctor(mockDoctorData)).rejects.toThrow(
-        'Clínica não encontrada com o CNPJ fornecido',
+        'Clínica não encontrada',
       );
     });
 
@@ -131,10 +134,7 @@ describe('DoctorService', () => {
         'erro',
       );
 
-      expect(pool.query).toHaveBeenCalledWith(
-        'DELETE FROM User WHERE id = ?',
-        [99],
-      );
+      expect(User.deleteUserById).toHaveBeenCalledWith(99);
     });
   });
 
