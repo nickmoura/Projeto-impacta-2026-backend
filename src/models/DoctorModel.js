@@ -34,7 +34,8 @@ class DoctorModel {
                 d.clinic_id,
                 u.id AS user_id,
                 u.nome,
-                u.email
+                u.email,
+                u.telefone
             FROM Doctor d
             JOIN User u ON d.user_id = u.id
             WHERE d.id = ?
