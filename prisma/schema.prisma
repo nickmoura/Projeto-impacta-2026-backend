@@ -24,6 +24,7 @@ model User {
   password     String
   role         Role
   clinic_id    Int
+  telefone     String?       @db.VarChar(255)
   appointments Appointment[] @relation("CreatedAppointments")
   doctor       Doctor?
   clinic       Clinic        @relation(fields: [clinic_id], references: [id], onDelete: Cascade)

@@ -37,6 +37,7 @@ class DoctorService {
         hashedPassword,
         'DOCTOR',
         clinic.id,
+        telefone,
       );
 
       const newDoctor = await Doctor.createDoctor(
@@ -88,6 +89,7 @@ class DoctorService {
     const useData = {
       name: data.name,
       email: data.email,
+      telefone: data.telefone,
     };
 
     if (data.password) {
