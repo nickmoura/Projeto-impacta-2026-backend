@@ -25,10 +25,13 @@ model User {
   role         Role
   clinic_id    Int
   telefone     String?       @db.VarChar(255)
-  appointments Appointment[] @relation("CreatedAppointments")
-  doctor       Doctor?
-  clinic       Clinic        @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
 
+  doctor       Doctor?
+  patient      Patient?
+
+  clinic       Clinic        @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
+  appointments Appointment[] @relation("CreatedAppointments")
+  
   @@index([clinic_id], map: "User_clinic_id_fkey")
 }
 
@@ -47,12 +50,12 @@ model Doctor {
 
 model Patient {
   id           Int           @id @default(autoincrement())
-  nome         String
-  email        String        @unique
-  telefone     String
+  user_id      Int           @unique
   clinic_id    Int
-  appointments Appointment[]
+
+  user         User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   clinic       Clinic        @relation(fields: [clinic_id], references: [id], onDelete: Cascade)
+  appointments Appointment[]
 
   @@index([clinic_id], map: "Patient_clinic_id_fkey")
 }
@@ -81,4 +84,5 @@ enum Role {
   ADMIN
   DOCTOR
   RECEPTIONIST
+  PATIENT
 }
