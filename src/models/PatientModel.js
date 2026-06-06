@@ -66,6 +66,21 @@ const Patient = {
     return rows[0];
   },
 
+  updatePatientById: async (patient_id, data) => {
+    const { nome, telefone } = data;
+
+    const query = `
+    UPDATE Patient p
+    INNER JOIN User u ON p.user_id = u.id
+    SET u.nome = ?, u.telefone = ?
+    WHERE p.id = ?
+  `;
+
+    await pool.query(query, [nome, telefone, patient_id]);
+
+    return { message: 'Patient updated' };
+  },
+
   deletePatientById: async (patient_id) => {
     const [result] = await pool.query('DELETE FROM Patient WHERE id = ?', [
       patient_id,
