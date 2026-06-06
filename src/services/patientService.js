@@ -5,7 +5,7 @@ import pool from '../config/db.js';
 
 class PatientService {
   async createPatient(data) {
-    const { nome, email, telefone, password, clinic_id } = data;
+    const { nome, email, password, clinic_id, telefone } = data;
 
     if (!nome || !email || !telefone || !password || !clinic_id) {
       throw new Error('Todos os campos são obrigatórios');
@@ -20,16 +20,12 @@ class PatientService {
         nome,
         email,
         hashedPassword,
-        'patient',
+        'PATIENT',
         clinic_id,
+        telefone,
       );
 
-      const patient = await Patient.createPatient(
-        nome,
-        email,
-        telefone,
-        user.id,
-      );
+      const patient = await Patient.createPatient(user.id, clinic_id);
 
       return patient;
     } catch (error) {
@@ -60,31 +56,20 @@ class PatientService {
     }
 
     try {
-      await Patient.putPatientbyId(patient_id, {
-        nome,
-        telefone,
-      });
+      const patient = await Patient.getPatientUserId(patient_id);
 
-      const [rows] = await pool.query(
-        'SELECT user_id FROM Patient WHERE id = ?',
-        [patient_id],
-      );
-
-      if (!rows.length) {
+      if (!patient) {
         throw new Error('Paciente não encontrado');
       }
 
-      const user_id = rows[0].user_id;
-
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await User.putUserById(user_id, {
+      await User.putUserById(patient.user_id, {
         nome,
         email,
+        telefone,
         password: hashedPassword,
       });
-
-      return { message: 'Paciente atualizado com sucesso' };
     } catch (error) {
       throw error;
     }
