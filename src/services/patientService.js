@@ -95,7 +95,7 @@ class PatientService {
     const novoNome = nome ?? patientAtual.nome;
     const novoTelefone = telefone ?? patientAtual.telefone;
 
-    await Patient.putPatientbyId(patient_id, {
+    await Patient.updatePatientById(patient_id, {
       nome: novoNome,
       telefone: novoTelefone,
     });
