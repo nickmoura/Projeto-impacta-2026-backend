@@ -1,4 +1,4 @@
-import ClinicModel from '../models/clinicModel.js';
+import ClinicModel from '../models/ClinicModel.js';
 
 class ClinicService {
   static async createClinic(data) {
